@@ -43,13 +43,12 @@ var chart = new Chart("chart", {
     },
 });
 
-const socket = io("http://172.20.139.134:5000/");
+const socket = io("https://localhost/");
 
 socket.on("plot", (data) => {
-    console.log(data);
     chart.data.labels.push(chart.data.labels[chart.data.labels.length - 1] + 1);
-    chart.data.datasets[0].data.push(data);
-    if (chart.data.labels.length > 10) {
+    chart.data.datasets[0].data.push(data.data);
+    if (chart.data.labels.length > 100) {
         chart.data.labels.shift();
         chart.data.datasets[0].data.shift();
     }
