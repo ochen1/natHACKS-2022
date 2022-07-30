@@ -63,7 +63,7 @@ body {
 .right .widget:nth-of-type(1), .right .widget:nth-of-type(2) {
     flex-grow: 1;
 }
-iframe {
+iframe, canvas {
     width: 100%;
     height: 100%;
     border: 4px solid transparent;
@@ -80,22 +80,9 @@ iframe {
     opacity: 0.9;
 }
 .curtain {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 0%;
-    transition: height 500ms ease;
-    overflow: hidden;
-    backdrop-filter: blur(6px);
-    /* background: rgba(20, 2, 64, 0.95); */
-    background: /* url("https://lh5.googleusercontent.com/pYLizlLfi8EnEDUZ9Je53PX6IIoANH4AzEg-yNrXQxMC-6jmAiz4dV22K8A--OxcPHgk_wFb1sh_fspkO8uX5URdri5xXmwtfgec9_MLsaGtjvow0t-UGczfjO1od2O5cLLEDiklHtesQT4B5uhiIQ"), */ linear-gradient(135deg, rgba(20,2,64,.9) 0%, rgba(79,11,129,.9) 100%);
-    background: rgb(6,125,204);
-    background: linear-gradient(135deg, rgba(6,125,204,0.9) 0%, rgba(156,77,203,0.9) 50%, rgba(255,64,225,0.9) 100%);
-
-    /* background-size: cover; */
-    background-position: center;
+    transition: opacity 200ms ease;
 }
 .curtain.activated {
-    height: 100%;
+    opacity: 0.1;
+    filter: blur(10px);
 }
