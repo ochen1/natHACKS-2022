@@ -43,7 +43,7 @@ var chart = new Chart("chart", {
     },
 });
 
-const socket = io("https://localhost/");
+const socket = io(window.location.origin);
 
 socket.on("plot", (data) => {
     chart.data.labels.push(chart.data.labels[chart.data.labels.length - 1] + 1);
