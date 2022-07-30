@@ -6,9 +6,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Web UI - natHACKS</title>
     <link rel="stylesheet" href="style.css">
-    <link href="/bootstrap.min.css" rel="stylesheet">
-    <script src="Chart.js"></script>
-    <script defer src="chart.js"></script>
+    <link href="/res/bootstrap.min.css" rel="stylesheet">
+    <script src="/res/Chart.js"></script>
+    <script src="/res/socket.io.min.js"></script>
+    <script defer src="script.js"></script>
 </head>
 <body>
     <div id="logo">
@@ -34,7 +35,6 @@
             </div>
             <div class="widget">
                 <canvas class="curtain" id="chart"></canvas>
-                <!-- <iframe src="chart.html" class="iframe"></iframe> -->
                 <button class="btn-hide">X</button>
             </div>
             <div class="widget">
