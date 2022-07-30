@@ -3,24 +3,20 @@ Mind Monitor - Minimal EEG OSC Receiver
 Coded: James Clutterbuck (2021)
 Requires: pip install python-osc
 """
+import time
 from datetime import datetime
 from tkinter.tix import WINDOW
-from pythonosc import dispatcher
-from pythonosc import osc_server
+
+import numpy as np
+import scipy.interpolate as interp
+import scipy.signal
+import sounddevice as sd
+from pythonosc import dispatcher, osc_server
 
 ip = "0.0.0.0"
 port = 5000
 
-
 queue = []
-
-import sounddevice as sd
-import numpy as np
-import scipy.interpolate as interp
-import scipy.signal
-import time
-
-
 start = time.time()
 
 
@@ -29,16 +25,11 @@ WINDOW_SIZE_SAMPLES = 800//3.1*WINDOW_SIZE_SECONDS
 playing = False
 
 
-def eeg_handler(address: str,*args):
+def eeg_handler(address: str, *args):
     global queue, playing
-    dateTimeObj = datetime.now()
-    printStr = dateTimeObj.strftime("%Y-%m-%d %H:%M:%S.%f")
-    for arg in args:
-        printStr += ","+str(arg)
-    #print(printStr)
-    queue.append(sum(args)/len(args))
+    queue.append(sum(args) / len(args))
     if len(queue) == WINDOW_SIZE_SAMPLES + 1:
-        print("queue filled at time", time.time() - start)
+        print("Queue filled at time", time.time() - start)
         print(min(queue), max(queue))
         # These numbers in the queue are in the range of 0 to +2048 (?)
         # However, most of the time they are in the range of +600 to +900
