@@ -1,0 +1,101 @@
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+body {
+    background: rgb(20,2,64);
+    background: linear-gradient(135deg, rgba(20,2,64,1) 0%, rgba(79,11,129,1) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
+#logo {
+    display: flex;
+    height: 16rem;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+#logo img {
+    height: 100%;
+    width: 100%;
+}
+#logo span {
+    display: block;
+    height :75%;
+    width: 1ch;
+    background: #fafafa;
+    opacity: .67;
+    margin: 0 5ch;
+}
+#text {
+    border: 2px solid #fcfffb;
+    background: transparent;
+    font-size: 30pt;
+    box-shadow: 0px 0px 5px 2px #47e6f2, inset 0px 0px 5px 2px #47e6f2;
+    padding: 7px;
+}
+#app {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    height: 750px;
+    width: 1000px;
+    margin: 0 auto;
+}
+.left, .right {
+    display: flex;
+    width: 50%;
+    height: 100%;
+    flex-direction: column;
+}
+.widget {
+    position: relative;
+    width: 100%;
+    min-height: 8rem;
+    overflow: hidden;
+}
+.left .widget {
+    flex-grow: 1;
+}
+.right .widget:nth-of-type(1), .right .widget:nth-of-type(2) {
+    flex-grow: 1;
+}
+iframe {
+    width: 100%;
+    height: 100%;
+    border: 4px solid transparent;
+    margin: 4px;
+}
+.btn-hide {
+    position: absolute;
+    top: 0;
+    right: 0;
+    opacity: 0.6;
+    transition: opacity 200ms ease;
+}
+.btn-hide:hover {
+    opacity: 0.9;
+}
+.curtain {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 0%;
+    transition: height 500ms ease;
+    overflow: hidden;
+    backdrop-filter: blur(6px);
+    /* background: rgba(20, 2, 64, 0.95); */
+    background: /* url("https://lh5.googleusercontent.com/pYLizlLfi8EnEDUZ9Je53PX6IIoANH4AzEg-yNrXQxMC-6jmAiz4dV22K8A--OxcPHgk_wFb1sh_fspkO8uX5URdri5xXmwtfgec9_MLsaGtjvow0t-UGczfjO1od2O5cLLEDiklHtesQT4B5uhiIQ"), */ linear-gradient(135deg, rgba(20,2,64,.9) 0%, rgba(79,11,129,.9) 100%);
+    background: rgb(6,125,204);
+    background: linear-gradient(135deg, rgba(6,125,204,0.9) 0%, rgba(156,77,203,0.9) 50%, rgba(255,64,225,0.9) 100%);
+
+    /* background-size: cover; */
+    background-position: center;
+}
+.curtain.activated {
+    height: 100%;
+}

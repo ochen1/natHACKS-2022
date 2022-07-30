@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web UI - natHACKS</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div id="logo">
+        <img src="https://lh6.googleusercontent.com/DbkN6Dsdnz6M1Ebv7QU14p0weAmw8WCOCp-9F3JFR7eylpzFzhBEtZPRXhPWhRQqjdW60jbxEnrG8FWKY1A4Wyxu40bP3yy4vQBZhSKJYIsyzTpO67dvpnh27cRQTktD6I-TFSuSiMGDaRU6tiOvyA" alt="">
+        <span></span>
+        <img src="https://lh6.googleusercontent.com/DbkN6Dsdnz6M1Ebv7QU14p0weAmw8WCOCp-9F3JFR7eylpzFzhBEtZPRXhPWhRQqjdW60jbxEnrG8FWKY1A4Wyxu40bP3yy4vQBZhSKJYIsyzTpO67dvpnh27cRQTktD6I-TFSuSiMGDaRU6tiOvyA" alt="">
+    </div>
+    <!-- <div id="text">
+        <span>cool text</span>
+    </div> -->
+    <div id="app">
+        <!-- Left -->
+        <div class="left col-md-6">
+            <div class="widget">
+                <!-- <iframe src="pomodoro.html" id="pomodoro_container"></iframe> -->
+                <!-- <iframe src="http://192.168.0.32:3000/" id="pomodoro_container"></iframe> -->
+                <iframe src="http://172.20.139.134:3000/#/" id="pomodoro_container"></iframe>
+            </div>
+        </div>
+        <!-- Right -->
+        <div class="right col-md-6">
+            <div class="widget">
+                <iframe src="spectrogram.html" class="iframe"></iframe>
+                <div class="curtain"></div>
+                <button class="btn-hide">X</button>
+            </div>
+            <div class="widget">
+                <iframe src="chart.html" class="iframe"></iframe>
+                <div class="curtain"></div>
+                <button class="btn-hide">X</button>
+            </div>
+            <div class="widget">
+                <iframe src="console.html" class="iframe"></iframe>
+            </div>
+        </div>
+    </div>
+    <script>
+        document.querySelectorAll(".btn-hide").forEach(btn => {
+            btn.addEventListener('click', e => {
+                e.target.parentElement.querySelector(".curtain").classList.toggle("activated");
+            });
+        });
+    </script>
+</body>
+</html>
