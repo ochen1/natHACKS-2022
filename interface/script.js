@@ -12,6 +12,7 @@ var chart = new Chart("chart", {
         ],
     },
     options: {
+        responsive: false,
         title: {
             display: true,
             text: 'Custom Chart Title',
@@ -54,3 +55,13 @@ socket.on("plot", (data) => {
     }
     chart.update();
 });
+
+function updateLayout() {
+    const chart = document.getElementById("chart");
+    chart.width = chart.getBoundingClientRect().width;
+    chart.height = Math.floor(chart.getBoundingClientRect().height);
+}
+
+// window.addEventListener("resize", updateLayout);
+// window.addEventListener("load", updateLayout);
+// setInterval(updateLayout, 1000);

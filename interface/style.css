@@ -5,7 +5,7 @@ html, body {
 }
 body {
     background: rgb(20,2,64);
-    background: linear-gradient(135deg, rgba(20,2,64,1) 0%, rgba(79,11,129,1) 100%);
+    background: linear-gradient(315deg, rgba(20,2,64,1) 0%, rgba(79,11,129,1) 100%);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -17,7 +17,7 @@ body {
     align-items: center;
     margin-bottom: 2rem;
 }
-#logo img {
+#logo img, #logo svg {
     height: 100%;
     width: 100%;
 }
@@ -68,6 +68,7 @@ iframe, canvas {
     height: 100%;
     border: 4px solid transparent;
     margin: 4px;
+    background: transparent;
 }
 .btn-hide {
     position: absolute;

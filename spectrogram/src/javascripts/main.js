@@ -81,6 +81,11 @@ $(function(){
 		window.parent.postMessage('ready','*');
 
 		var sp = spec3D;
+		document.addEventListener('click', function (e) {
+			console.log("toggle live");
+			// sp.live();
+			document.querySelector('[data-mic]').click();
+		})
 		sp.attached();
 		// --------------------------------------------
 		$('.music-box__tool-tip').hide(0);
@@ -107,7 +112,7 @@ $(function(){
 						$(this).removeClass('selected');
 					}else{
 						// Show Record Modal Screen *******************************
-						$('#record').fadeIn().delay(2000).fadeOut();
+						//$('#record').fadeIn().delay(2000).fadeOut();
 						// Start Recording ****************************************
 						sp.live();
 					}
@@ -133,10 +138,10 @@ $(function(){
 		}
 
 		window.addEventListener('blur', function() {
-		   killSound();
+		   //killSound();
 		});
 		document.addEventListener('visibilitychange', function(){
-		    killSound();
+		    //killSound();
 		});
 
         var decodeBuffer = function(file) {
