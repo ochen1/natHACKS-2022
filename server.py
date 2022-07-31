@@ -158,7 +158,7 @@ def plot_update(_):
     plt.plot(range(len(plot_data[1])), attention, color='red', label='Visual & Spatial Attention (Theta / Alpha)')
 
     # Plot the beta / alpha ratio, demonstrated to be highly correlated with alertness and concentration
-    alertness = [(1 - (b / a) if abs(b) > 0.1 else 0.5) for a, b in zip(plot_data[3], plot_data[2])]
+    alertness = [(1 - (b / a) if abs(a) > 0.1 else 0.5) for a, b in zip(plot_data[3], plot_data[2])]
     plt.plot(range(len(plot_data[3])), alertness, color='green', label='Alertness & Concentration (Beta / Alpha)')
 
     # Plot the average of the attention and alertness ratios
