@@ -1,0 +1,172 @@
+// $blue: #1e88e5;
+// $dark: #161616;
+
+$primary: #0098f7;
+$primary-bg: #111d25;
+$secondary-bg: #1c2830;
+$color-grey: #a7abae;
+$box-border: rgba($color-grey, 0.05);
+
+* {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+    font-family: "Noto Sans", "Montserrat", sans-serif;
+    color: $color-grey;
+    text-align: center;
+}
+
+h1 {
+    font-weight: 400;
+    font-size: 3rem;
+}
+
+p {
+    font-size: 1.3rem;
+}
+
+body {
+    background-color: $primary-bg;
+    height: 100vh;
+    width: 100vw;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    .container {
+        margin: auto;
+        width: 30rem;
+
+        .progress-container {
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            align-items: center;
+
+            .progress {
+                margin: auto;
+                width: 18rem;
+            }
+
+            .progress-text {
+                h1 {
+                    color: $primary;
+                }
+
+                .status p {
+                    color: $color-grey;
+                }
+            }
+        }
+
+        .list {
+            background-color: $secondary-bg;
+            border: 1px solid $box-border;
+            padding: 0.6rem 0.4rem 1.1rem;
+            width: 18rem;
+            margin: 1.5rem auto;
+
+            .task-container {
+                width: 100%;
+
+                div {
+                    margin: 0.5rem 1rem;
+                    display: flex;
+                    flex-direction: row;
+                    justify-content: space-between;
+                    align-items: center;
+
+                    p {
+                        font-size: 1rem;
+                    }
+
+                    svg {
+                        font-size: 1.4rem;
+                        cursor: pointer;
+                    }
+                }
+            }
+
+            hr {
+                border: none;
+                border-top: 1px solid $box-border;
+                margin: 1rem auto 0.7rem;
+            }
+
+            .input-container {
+                input {
+                    background: none;
+                    outline: none;
+                    border: none;
+                    border-bottom: 2px solid rgba($color-grey, 0.5);
+                    transition: 50ms border-bottom linear;
+                    font-size: 1rem;
+                    width: 10rem;
+                    margin-right: 0.5rem;
+
+                    &:focus {
+                        border-bottom: 2px solid $color-grey;
+                    }
+                }
+
+                button {
+                    outline: none;
+                    background: none;
+                    border: none;
+                    font-size: 1.3rem;
+                    cursor: pointer;
+                }
+            }
+        }
+
+        .footer {
+            position: sticky;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            width: 100%;
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            align-items: center;
+
+            .grace-time-container {
+                position: relative;
+
+                p {
+                    font-size: 1.8rem;
+                    font-weight: 500;
+                    margin-bottom: 1.7rem;
+
+                    span {
+                        display: none;
+                        position: absolute;
+                        left: -11rem;
+                        top: 0;
+                        padding: 0.4rem 0.2rem;
+                        background-color: $secondary-bg;
+                        border: rgba($color-grey, 0.05);
+                        font-size: 0.8rem;
+                        width: 10rem;
+                        z-index: 10000;
+                    }
+
+                    &:hover {
+                        span {
+                            display: block;
+                        }
+                    }
+                }
+            }
+
+            .button-control-container {
+                button {
+                    background: none;
+                    border: 2px solid $color-grey;
+                    margin: 0 1.5rem 0 2rem;
+                }
+            }
+        }
+    }
+}
