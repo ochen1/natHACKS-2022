@@ -1,4 +1,5 @@
 import math
+from queue import Queue
 import time
 from threading import Thread
 
@@ -9,14 +10,15 @@ import scipy.signal
 import sounddevice as sd
 from flask import Flask, jsonify, request, send_from_directory
 from flask_cors import CORS
-from flask_socketio import SocketIO
+from flask_sock import Sock
 from matplotlib.animation import FuncAnimation
 from pythonosc import dispatcher
 from pythonosc.osc_server import ThreadingOSCUDPServer
 
+
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret!'
-socketio = SocketIO(app)
+sock = Sock(app)
 CORS(app)
 
 
@@ -26,9 +28,11 @@ http_port = 8080 # /tcp
 osc_port = 5000 # /udp
 
 # Muse Variables
-hsi = [4,4,4,4]
-abs_waves = [-1,-1,-1,-1,-1]
-rel_waves = [-1,-1,-1,-1,-1]
+hsi = (4, 4, 4, 4)
+last_hsi = (-1, -1, -1, -1)
+abs_waves = [-1, -1, -1, -1, -1]
+rel_waves = [-1, -1, -1, -1,-1]
+publish_queue = Queue()
 
 # Plot Array
 plot_val_count = 200
@@ -46,13 +50,15 @@ playing = False
 
 # Horseshoe handler
 def hsi_handler(address: str, *args):
-    global hsi
+    global hsi, last_hsi
     hsi = args
-    print(hsi)
+    if hsi == last_hsi:
+        return
     if hsi == (1, 1, 1, 1):
         print("Muse fit good")
     else:
         print("Muse fit bad:    " + '   '.join(["Left Ear", "Left Forehead", "Right Forehead", "Right Ear"][i] for i in range(len(hsi)) if hsi[i] != 1.0))
+    last_hsi = hsi
 
 
 # Frequency band handler
@@ -86,6 +92,7 @@ def abs_handler(address: str, *args):
 
 # Raw EEG data handler
 def eeg_handler(address: str, *args):
+    return
     global queue, playing
     queue.append(sum(args) / len(args))
     if len(queue) == WINDOW_SIZE_SAMPLES + 1:
@@ -117,6 +124,12 @@ def eeg_handler(address: str, *args):
         playing = False
 
 
+
+# Start EEG handler in separate thread
+def eeg_handler_wrapper(address: str, *args):
+    Thread(target=eeg_handler, args=(address, *args)).start()
+
+
 # Update the plot data based on the EEG data
 def update_plot_vars(wave):
     global plot_data, rel_waves, plot_val_count
@@ -135,14 +148,14 @@ def plot_update(_):
 
     for wave in [0, 1, 2, 3, 4]:
         color, wave_name = [("red", "Delta"), ("purple", "Theta"), ("blue", "Alpha"), ("green", "Beta"), ("orange", "Gamma")][wave]
-        plt.plot(range(len(plot_data[wave])), plot_data[wave], color=color, label=f"{wave_name} {plot_data[wave][len(plot_data[wave])-1]:.4f}")
+        # plt.plot(range(len(plot_data[wave])), plot_data[wave], color=color, label=f"{wave_name} {plot_data[wave][len(plot_data[wave])-1]:.4f}")
 
     # Plot the theta / alpha ratio, demonstrated to be highly correlated with visual and spatial attention
-    attention = [((a / b) if abs(b) < 0.1 else 0.5) for a, b in zip(plot_data[1], plot_data[2])]
+    attention = [((a / b) if abs(b) > 0.1 else 0.5) for a, b in zip(plot_data[1], plot_data[2])]
     plt.plot(range(len(plot_data[1])), attention, color='red', label='Visual & Spatial Attention (Theta / Alpha)')
 
     # Plot the beta / alpha ratio, demonstrated to be highly correlated with alertness and concentration
-    alertness = [(1 - (b / a) if abs(b) < 0.1 else 0.5) for a, b in zip(plot_data[3], plot_data[2])]
+    alertness = [(1 - (b / a) if abs(b) > 0.1 else 0.5) for a, b in zip(plot_data[3], plot_data[2])]
     plt.plot(range(len(plot_data[3])), alertness, color='green', label='Alertness & Concentration (Beta / Alpha)')
 
     # Plot the average of the attention and alertness ratios
@@ -153,10 +166,10 @@ def plot_update(_):
     plt.plot([0, len(plot_data[0])], [0.5, 0.5], color='black', label='Activation Threshold', linestyle='dashed')
 
     # Publish the most recently-added plot data (ratio average)
-    socketio.emit('plot', {"data": average[-1]})
+    publish_value(average[-1])
 
     # Set the y-axis range
-    plt.ylim(0, 1)
+    plt.ylim(-1, 2)
     # Set the x-axis ticks
     plt.xticks([])
 
@@ -189,14 +202,54 @@ def send_spectrogram(path):
     return send_from_directory('spectrogram/build/', path)
 
 
-@socketio.on('connect')
-def on_connect():
-    print('Client connected from ' + request.remote_addr)
+listening_clients = []
 
 
-@socketio.on('disconnect')
-def on_disconnect():
-    print('Client disconnected from ' + request.remote_addr)
+@sock.route('/ws')
+def listen(ws):
+    print("Client connected from", request.remote_addr)
+    listening_clients.append(ws)
+    while True:
+        message = ws.receive()
+        if message is None:
+            break
+        print("Received message:", message)
+        for client in listening_clients:
+            client.send(message)
+    print("Client disconnected from", request.remote_addr)
+    listening_clients.remove(ws)
+
+
+
+def publish_value(value):
+    # socketio.emit('plot', {'data': value})
+    publish_queue.put(value)
+
+
+def publish_value_task():
+    while True:
+        value = publish_queue.get()
+        print("Publishing value", value)
+        for ws in listening_clients:
+            try:
+                ws.send(value)
+            except Exception as e:
+                print("Error sending value to client:", e)
+                listening_clients.remove(ws)
+
+
+def blink_handler(address: str, *args):
+    print('blink', args)
+
+
+def jaw_clench_handler(address: str, *args):
+    print('jaw', args)
+
+
+address_list = set()
+def default_handler(address: str, *args):
+    address_list.add(address)
+    # print(address_list)
 
 
 if __name__ == "__main__":
@@ -206,7 +259,7 @@ if __name__ == "__main__":
     dispatcher.map("/muse/elements/horseshoe", hsi_handler)
 
     # Absolute waves
-    dispatcher.map("/muse/eeg", eeg_handler)
+    dispatcher.map("/muse/eeg", eeg_handler_wrapper)
     
     # Frequency bands
     dispatcher.map("/muse/elements/delta_absolute", abs_handler, 0)
@@ -215,13 +268,29 @@ if __name__ == "__main__":
     dispatcher.map("/muse/elements/beta_absolute",  abs_handler, 3)
     dispatcher.map("/muse/elements/gamma_absolute", abs_handler, 4)
 
-    osc_server = ThreadingOSCUDPServer((ip, http_port), dispatcher)
+    # Muse Algorithms
+    dispatcher.map("/muse/elements/blink", blink_handler)
+    dispatcher.map("/muse/elements/jaw_clench", jaw_clench_handler)
+    dispatcher.set_default_handler(default_handler)
+
+    osc_server = ThreadingOSCUDPServer((ip, osc_port), dispatcher)
 
     print(f"OSC Server: Listening on UDP port {osc_port}")
     Thread(target=osc_server.serve_forever, daemon=True).start()
 
     print(f"HTTP Server: Listening on TCP port {http_port}")
-    Thread(target=lambda: socketio.run(app, host=ip, port=http_port, debug=False, use_reloader=False, certfile='ssl/cert.pem', keyfile='ssl/key.pem'), daemon=True).start()
+    Thread(target=lambda: app.run(host=ip, port=http_port, debug=False, use_reloader=False), daemon=True).start()
+
+    Thread(target=publish_value_task, daemon=True).start()
+
+    if False:
+        def random_data():
+            import random
+            while True:
+                print("WARNING: Sending random data!")
+                socketio.emit('plot', {"data": random.random()})
+                time.sleep(1)
+        Thread(target=random_data, daemon=True).start()
     
     print(f"Plot: Starting")
     init_plot()
