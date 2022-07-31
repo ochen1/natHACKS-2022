@@ -25,7 +25,7 @@ CORS(app)
 # Network Variables
 ip = "0.0.0.0"
 http_port = 8080 # /tcp
-osc_port = 5000 # /udp
+osc_port = 5001 # /udp
 
 # Muse Variables
 hsi = (4, 4, 4, 4)
@@ -42,13 +42,7 @@ plot_val_count = 200
 plot_data = [[0],[0],[0],[0],[0]]
 
 # Audio Data Queue
-queue = []
 start = time.time()
-
-# Audio Variables
-WINDOW_SIZE_SECONDS = 1
-WINDOW_SIZE_SAMPLES = 800//3.1*WINDOW_SIZE_SECONDS
-playing = False
 
 
 # Horseshoe handler
@@ -93,46 +87,6 @@ def abs_handler(address: str, *args):
         update_plot_vars(wave)
 
 
-# Raw EEG data handler
-def eeg_handler(address: str, *args):
-    return
-    global queue, playing
-    queue.append(sum(args) / len(args))
-    if len(queue) == WINDOW_SIZE_SAMPLES + 1:
-        print("Queue filled at time", time.time() - start)
-        print(min(queue), max(queue))
-        # Raw EEG data uses the unit μV, in the range of 0 to +2048
-        # Most of the time, they are in the range of +600 to +900
-        # The sound device accepts values in the range of -1 to +1
-        # EEG data is in the frequency range of 1Hz to 100Hz
-        # Sound data is in the frequency range of 100Hz to 10,000Hz
-        # An example of an octave is the range of 440Hz to 880Hz
-
-        # t = interp.interp1d([600, 1000], [-1, 1])(queue)
-        t = (np.float32(queue) / 1000 - 0.7) * 20
-        queue = [] # Clear the queue
-        t = scipy.signal.resample(t, 44100//3) # Frequency range stretching
-        t = np.fft.rfft(t) # Apply a real short-time fast Fourier transform
-        t = np.roll(t, 200) # Shift the frequency range upwards
-        t[:200] = 0 # Zero out the low frequencies
-        t = np.fft.irfft(t) # Apply an inverse real short-time fast Fourier transform
-        t = scipy.signal.resample(t, 44100) # Complete the frequency range stretching
-        t = (t/2+0.5)*2-1 # Ensure that the sound is in the range of -1 to +1
-
-        while playing == True: # Wait until the sound is finished playing
-            pass
-
-        playing = True
-        sd.play(t, 44100//WINDOW_SIZE_SECONDS, blocking=True) # Play the sound
-        playing = False
-
-
-
-# Start EEG handler in separate thread
-def eeg_handler_wrapper(address: str, *args):
-    Thread(target=eeg_handler, args=(address, *args)).start()
-
-
 # Update the plot data based on the EEG data
 def update_plot_vars(wave):
     global plot_data, rel_waves, plot_val_count
@@ -158,11 +112,11 @@ def plot_update(_):
     plt.plot(range(len(plot_data[1])), attention, color='red', label='Visual & Spatial Attention (Theta / Alpha)')
 
     # Plot the beta / alpha ratio, demonstrated to be highly correlated with alertness and concentration
-    alertness = [(1 - (b / a) if abs(a) > 0.1 else 0.5) for a, b in zip(plot_data[3], plot_data[2])]
+    alertness = [((a / b) if abs(a) > 0.1 else 0.5) for a, b in zip(plot_data[3], plot_data[2])]
     plt.plot(range(len(plot_data[3])), alertness, color='green', label='Alertness & Concentration (Beta / Alpha)')
 
     # Plot the average of the attention and alertness ratios
-    average = [(a + b) / 2 for a, b in zip(attention, alertness)]
+    average = [((a + b) / 2) for a, b in zip(attention, alertness)]
     plt.plot(range(len(average)), average, color='black', label='Average Attention & Alertness')
 
     # Plot the activation threshold
@@ -269,9 +223,6 @@ if __name__ == "__main__":
     # Horseshoe
     dispatcher.map("/muse/elements/horseshoe", hsi_handler)
 
-    # Absolute waves
-    dispatcher.map("/muse/eeg", eeg_handler_wrapper)
-    
     # Frequency bands
     dispatcher.map("/muse/elements/delta_absolute", abs_handler, 0)
     dispatcher.map("/muse/elements/theta_absolute", abs_handler, 1)
@@ -294,7 +245,7 @@ if __name__ == "__main__":
 
     Thread(target=publish_value_task, daemon=True).start()
 
-    if True:
+    if False:
         def random_data():
             import random
             while True:

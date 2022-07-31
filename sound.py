@@ -15,7 +15,7 @@ import sounddevice as sd
 from pythonosc import dispatcher, osc_server
 
 ip = "0.0.0.0"
-port = 5000
+port = 5002
 
 
 queue = Queue(2)

@@ -34,8 +34,8 @@ var chart = new Chart("chart", {
                 {
                     ticks: {
                         fontColor: 'rgba(255, 255, 255, 0.87)',
-                        min: 0,
-                        max: 1,
+                        suggestedmin: 0,
+                        suggestedmax: 1,
                         stepSize: 0.1,
                     }
                 }
