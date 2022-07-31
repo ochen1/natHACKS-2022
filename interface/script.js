@@ -57,8 +57,8 @@ socket.addEventListener('open', () => {
 
 socket.addEventListener('message', (event) => {
     chart.data.labels.push(chart.data.labels[chart.data.labels.length - 1] + 1);
-    chart.data.datasets[0].data.push(event.data.parse()[0]);
-    chart.data.datasets[1].data.push(event.data.parse()[1]);
+    chart.data.datasets[0].data.push(JSON.parse(event.data)[0]);
+    chart.data.datasets[1].data.push(JSON.parse(event.data)[1]);
     if (chart.data.labels.length > 40) {
         chart.data.labels.shift();
         chart.data.datasets[0].data.shift();
