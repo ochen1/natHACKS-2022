@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from "react";
 import TimeFormat from "hh-mm-ss";
 import { buildStyles, CircularProgressbarWithChildren } from "react-circular-progressbar";
-import PlayArrowOutlinedIcon from '@mui/icons-material/PlayArrowOutlined';
+import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import PauseIcon from '@mui/icons-material/Pause';
 import Fab from "@mui/material/Fab";
 import Zoom from "@mui/material/Zoom";
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import ReplayIcon from '@mui/icons-material/Replay';
-import Replay from "@mui/icons-material/Replay";
+import SkipNextIcon from '@mui/icons-material/SkipNext';
+import VolumeUpIcon from '@mui/icons-material/VolumeUp';
 
 function App() {
     // const defaultFocusTime = 60 * 25;
@@ -23,7 +24,6 @@ function App() {
         count: 1,
         time: 10 * 1000
     });
-    // const [finishFocusTime, setFinishFocusTime] = useState(false);
     const [status, setStatus] = useState("Stay Focused");
     const [tasks, setTasks] = useState(["Add a Task"]);
     const [inputTask, setInputTask] = useState("");
@@ -114,8 +114,6 @@ function App() {
 
     useEffect(() => {
         setTimeout(() => {
-            console.log(timer.current.timeLeft);
-
             if (status === "Stay Focused") {
                 setTimerPercentage(timer.current.timeLeft / defaultFocusTime * 100);
             } else if (status === "Grace Time") {
@@ -250,17 +248,25 @@ function App() {
 
                 <div className="button-control-container">
                     <Zoom in={true}>
-                        <Fab onClick={handleStartClick}>
-                            {isStart ? <PlayArrowOutlinedIcon fontSize="large" /> : <PauseIcon fontSize="large" />}
-                        </Fab>
-                    </Zoom>
-
-                    <Zoom in={true}>
                         {
                             status === "Stay Focused"
                                 ? <ReplayIcon fontSize="large" name="clickable" style={resetIconStyle} onClick={handleResetClick} />
                                 : <ReplayIcon fontSize="large" name="unclickable" style={resetIconStyle} />
                         }
+                    </Zoom>
+
+                    <Zoom in={true}>
+                        <Fab onClick={handleStartClick}>
+                            {isStart ? <PlayArrowIcon fontSize="large" /> : <PauseIcon fontSize="large" />}
+                        </Fab>
+                    </Zoom>
+
+                    <Zoom in={true}>
+                        <SkipNextIcon fontSize="large" />
+                    </Zoom>
+
+                    <Zoom in={true}>
+                        <VolumeUpIcon fontSize="large" />
                     </Zoom>
                 </div>
             </div>

@@ -1,6 +1,3 @@
-// $blue: #1e88e5;
-// $dark: #161616;
-
 $primary: #0098f7;
 $primary-bg: #111d25;
 $secondary-bg: #1c2830;
@@ -161,10 +158,18 @@ body {
             }
 
             .button-control-container {
+                svg[data-testid=ReplayIcon] {
+                    margin-left: 1.3rem;
+                }
+
                 button {
                     background: none;
                     border: 2px solid $color-grey;
-                    margin: 0 1.5rem 0 2rem;
+                    margin: 0 1.5rem;
+                }
+
+                svg[data-testid=SkipNextIcon] {
+                    margin-right: 1rem;
                 }
             }
         }

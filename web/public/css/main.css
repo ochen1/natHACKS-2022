@@ -129,8 +129,14 @@ body .container .footer .grace-time-container p span {
 body .container .footer .grace-time-container p:hover span {
   display: block;
 }
+body .container .footer .button-control-container svg[data-testid=ReplayIcon] {
+  margin-left: 1.3rem;
+}
 body .container .footer .button-control-container button {
   background: none;
   border: 2px solid #a7abae;
-  margin: 0 1.5rem 0 2rem;
+  margin: 0 1.5rem;
+}
+body .container .footer .button-control-container svg[data-testid=SkipNextIcon] {
+  margin-right: 1rem;
 }/*# sourceMappingURL=main.css.map */
