@@ -283,13 +283,13 @@ if __name__ == "__main__":
 
     Thread(target=publish_value_task, daemon=True).start()
 
-    if False:
+    if True:
         def random_data():
             import random
             while True:
                 print("WARNING: Sending random data!")
-                socketio.emit('plot', {"data": random.random()})
-                time.sleep(1)
+                publish_value(random.random())
+                time.sleep(0.1)
         Thread(target=random_data, daemon=True).start()
     
     print(f"Plot: Starting")
