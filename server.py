@@ -5,6 +5,7 @@ from threading import Thread
 
 import matplotlib.pyplot as plt
 import numpy as np
+import json
 import scipy
 import scipy.signal
 import sounddevice as sd
@@ -123,7 +124,7 @@ def plot_update(_):
     plt.plot([0, len(plot_data[0])], [0.5, 0.5], color='black', label='Activation Threshold', linestyle='dashed')
 
     # Publish the most recently-added plot data (ratio average)
-    publish_value(average[-1])
+    publish_value((attention[-1], alertness[-1]))
 
     # Set the y-axis range
     plt.ylim(-1, 2)
@@ -189,7 +190,7 @@ def publish_value_task():
         print("Publishing value", value)
         for ws in listening_clients:
             try:
-                ws.send(value)
+                ws.send(json.dumps(value))
             except Exception as e:
                 print("Error sending value to client:", e)
                 listening_clients.remove(ws)
