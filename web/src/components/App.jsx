@@ -9,13 +9,17 @@ import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import ReplayIcon from '@mui/icons-material/Replay';
 import SkipNextIcon from '@mui/icons-material/SkipNext';
 import VolumeUpIcon from '@mui/icons-material/VolumeUp';
+import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 
 function App() {
     // const defaultFocusTime = 60 * 25;
     const defaultFocusTime = 5 * 1000;
     // const defaultBreakTime = 60 * 5 * 1000;
-    const defaultBreakTime = 15 * 1000;
+    const defaultShortBreakTime = 3 * 1000;
+    // const defaultLongBreakTime = 60 * 20 * 1000;
+    const defaultLongBreakTime = 4 * 1000;
 
+    const [defaultBreakTime, setDefaultBreakTime] = useState(defaultShortBreakTime);
     const [graceTime, setGraceTime] = useState({
         // count: 0,
         // time: 0, (make this count * 60 * 5 * 1000 dynamically)
@@ -29,6 +33,7 @@ function App() {
     const [inputTask, setInputTask] = useState("");
     const [isStart, setIsStart] = useState(false);
     const [timerPercentage, setTimerPercentage] = useState(100);
+    const [sessionCount, setSessionCount] = useState(-1);
     const [timeLeft, setTimeLeft] = React.useState(0);
     const timer = React.useRef({});
 
@@ -93,17 +98,6 @@ function App() {
         [],
     );
 
-    const reset = React.useCallback(
-        () => {
-            if (timer.current.timeLeft) {
-                window.cancelAnimationFrame(timer.current.requestId);
-                timer.current = {};
-                setTimeLeft(0);
-            }
-        },
-        [],
-    );
-
     React.useEffect(() => {
         return () => window.cancelAnimationFrame(timer.current.requestId);
     }, []);
@@ -145,6 +139,20 @@ function App() {
             }
         }, 1000);
     }, [timer.current.timeLeft]);
+
+    useEffect(() => {
+        if (status === "Stay Focused") {
+            if (sessionCount === 3) {
+                setDefaultBreakTime(defaultLongBreakTime);
+
+                setSessionCount(0);
+            } else {
+                setDefaultBreakTime(defaultBreakTime);
+
+                setSessionCount((prev) => prev + 1);
+            }
+        }
+    }, [status]);
 
     const progressBarStyle = {
         pathTransitionDuration: 0.5,
@@ -242,18 +250,20 @@ function App() {
             </div>
 
             <div className="footer">
+                <div className="session-count-container">
+                    <p>{sessionCount}/4<span>Number of sessions completed</span></p>
+                </div>
+
                 <div className="grace-time-container">
                     <p>{graceTime.count}<span>Number of grace time sessions added</span></p>
                 </div>
 
                 <div className="button-control-container">
-                    <Zoom in={true}>
-                        {
-                            status === "Stay Focused"
-                                ? <ReplayIcon fontSize="large" name="clickable" style={resetIconStyle} onClick={handleResetClick} />
-                                : <ReplayIcon fontSize="large" name="unclickable" style={resetIconStyle} />
-                        }
-                    </Zoom>
+                    {
+                        status === "Stay Focused"
+                            ? <ReplayIcon fontSize="large" name="clickable" style={resetIconStyle} onClick={handleResetClick} />
+                            : <ReplayIcon fontSize="large" name="unclickable" style={resetIconStyle} />
+                    }
 
                     <Zoom in={true}>
                         <Fab onClick={handleStartClick}>
@@ -261,13 +271,9 @@ function App() {
                         </Fab>
                     </Zoom>
 
-                    <Zoom in={true}>
-                        <SkipNextIcon fontSize="large" />
-                    </Zoom>
-
-                    <Zoom in={true}>
-                        <VolumeUpIcon fontSize="large" />
-                    </Zoom>
+                    <SkipNextIcon fontSize="large" />
+                    <VolumeUpIcon fontSize="large" />
+                    <OpenInNewIcon fontSize="large" />
                 </div>
             </div>
         </div>

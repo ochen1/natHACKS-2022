@@ -106,25 +106,38 @@ body .container .footer {
   justify-content: center;
   align-items: center;
 }
+body .container .footer .session-count-container,
 body .container .footer .grace-time-container {
   position: relative;
 }
+body .container .footer .session-count-container p,
 body .container .footer .grace-time-container p {
   font-size: 1.8rem;
   font-weight: 500;
   margin-bottom: 1.7rem;
 }
+body .container .footer .session-count-container p span,
 body .container .footer .grace-time-container p span {
   display: none;
   position: absolute;
   left: -11rem;
-  top: 0;
+  top: -0.2rem;
   padding: 0.4rem 0.2rem;
   background-color: #1c2830;
   border: rgba(167, 171, 174, 0.05);
   font-size: 0.8rem;
   width: 10rem;
-  z-index: 10000;
+  z-index: 1;
+}
+body .container .footer .session-count-container p:hover span,
+body .container .footer .grace-time-container p:hover span {
+  display: block;
+}
+body .container .footer .grace-time-container p {
+  margin-left: 1.5rem;
+}
+body .container .footer .grace-time-container p span {
+  left: -9rem;
 }
 body .container .footer .grace-time-container p:hover span {
   display: block;
@@ -139,4 +152,10 @@ body .container .footer .button-control-container button {
 }
 body .container .footer .button-control-container svg[data-testid=SkipNextIcon] {
   margin-right: 1rem;
+}
+body .container .footer .button-control-container svg[data-testid=VolumeUpIcon] {
+  margin-right: 1rem;
+}
+body .container .footer .button-control-container svg[data-testid=OpenInNewIcon] {
+  transform: rotate(180deg);
 }/*# sourceMappingURL=main.css.map */
