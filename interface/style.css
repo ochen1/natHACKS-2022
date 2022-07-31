@@ -39,7 +39,8 @@ body {
 #app {
     display: flex;
     flex-direction: row;
-    justify-content: space-between;
+    /* justify-content: space-between; */
+    justify-content: center;
     align-items: center;
     height: 750px;
     width: 1000px;
@@ -50,6 +51,27 @@ body {
     width: 50%;
     height: 100%;
     flex-direction: column;
+}
+.right.invis {
+    animation: goodbye 400ms ease-in;
+    animation-fill-mode: forwards;
+}
+@keyframes goodbye {
+    0% {
+        transform: scaleY(100%);
+        opacity: 1;
+        width: 50%;
+    }
+    50% {
+        transform: scaleY(1%);
+        opacity: 0.8;
+        width: 50%;
+    }
+    100% {
+        transform: scaleY(1%);
+        width: 0%;
+        opacity: 0;
+    }
 }
 .widget {
     position: relative;
@@ -86,4 +108,11 @@ iframe, canvas {
 .curtain.activated {
     opacity: 0.1;
     filter: blur(10px);
+}
+.curtain.activated:hover {
+    opacity: 0.2;
+}
+button.collapse-btn {
+    height: 100%;
+    width: 3rem;
 }

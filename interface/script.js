@@ -44,17 +44,22 @@ var chart = new Chart("chart", {
     },
 });
 
-const socket = io(window.location.origin);
+const socket = new WebSocket(window.location.origin.replace(/^http/, 'ws') + "/ws");
+socket.addEventListener('open', () => {
+    console.log('Connected to server');
+});
 
-socket.on("plot", (data) => {
+socket.addEventListener('message', (event) => {
+    console.log(event.data);
     chart.data.labels.push(chart.data.labels[chart.data.labels.length - 1] + 1);
-    chart.data.datasets[0].data.push(data.data);
+    chart.data.datasets[0].data.push(event.data);
     if (chart.data.labels.length > 100) {
         chart.data.labels.shift();
         chart.data.datasets[0].data.shift();
     }
     chart.update();
 });
+
 
 function updateLayout() {
     const chart = document.getElementById("chart");
