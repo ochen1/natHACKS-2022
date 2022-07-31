@@ -4,14 +4,16 @@ var chart = new Chart("chart", {
         labels: [0],
         datasets: [
             {
+                label: "Attention",
                 data: [0],
-                borderColor: "rgba(0, 255, 0, 0.4)",
                 fill: false,
+                borderColor: "rgba(89, 239, 254, 0.4)",
                 backgroundColor: "transparent",
             },
             {
+                label: "Alertness",
                 data: [0],
-                borderColor: "rgba(0, 0, 255, 0.4)",
+                borderColor: "rgba(255, 0, 211, 0.4)",
                 fill: false,
                 backgroundColor: "transparent",
             },
@@ -25,7 +27,11 @@ var chart = new Chart("chart", {
             fontColor: 'rgba(255, 255, 255, 0.87)',
         },
         legend: {
-            display: false,
+            // Display a legend for the two datasets
+            display: true,
+            labels: {
+                fontColor: 'rgba(255, 255, 255, 0.87)',
+            },
         },
         animation: {
             duration: 1000,
