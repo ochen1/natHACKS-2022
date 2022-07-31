@@ -10,6 +10,8 @@ import ReplayIcon from '@mui/icons-material/Replay';
 import Replay from "@mui/icons-material/Replay";
 
 function App() {
+    let trackingInterval;
+
     // const defaultFocusTime = 60 * 25;
     const defaultFocusTime = 5 * 1000;
     // const defaultBreakTime = 60 * 5 * 1000;
@@ -19,130 +21,232 @@ function App() {
     const [restTime, setRestTime] = useState(defaultBreakTime);
     const [graceTime, setGraceTime] = useState({
         // count: 0,
-        count: 3,
-        time: 3 * 60 * 5 * 1000
+        // time: 0, (make this count * 60 * 5 * 1000 dynamically)
+        // count: 3,
+        // time: 3 * 60 * 5 * 1000
+        count: 1,
+        time: 10 * 1000
     });
-    const [finishFocusTime, setFinishFocusTime] = useState(false);
-    const [status, setStatus] = useState("Stay Focused"); /* 3 modes: stay focused, grace time, break */
+    // const [finishFocusTime, setFinishFocusTime] = useState(false);
+    const [status, setStatus] = useState("Stay Focused");
     const [tasks, setTasks] = useState(["Add a Task"]);
     const [inputTask, setInputTask] = useState("");
     const [isStart, setIsStart] = useState(false);
     const [timerPercentage, setTimerPercentage] = useState(100);
+    const [timeLeft, setTimeLeft] = React.useState(0);
+    const timer = React.useRef({});
 
-    function useCountDown(timeToCount = 60 * 1000, interval = 1000) {
-        const [timeLeft, setTimeLeft] = React.useState(0);
-        const timer = React.useRef({});
+    const interval = 1000;
 
-        const start = React.useCallback(
-            (ttc) => {
+    const start = React.useCallback(
+        (timeToCount, ttc) => {
+            window.cancelAnimationFrame(timer.current.requestId);
+
+            const newTimeToCount = ttc !== undefined ? ttc : timeToCount;
+            timer.current.started = null;
+            timer.current.lastInterval = null;
+            timer.current.timeToCount = newTimeToCount;
+            timer.current.requestId = window.requestAnimationFrame(run);
+
+            setTimeLeft(newTimeToCount);
+        },
+        [],
+    );
+
+    const run = (ts) => {
+        if (!timer.current.started) {
+            timer.current.started = ts;
+            timer.current.lastInterval = ts;
+        }
+
+        const localInterval = Math.min(interval, (timer.current.timeLeft || Infinity));
+        if ((ts - timer.current.lastInterval) >= localInterval) {
+            timer.current.lastInterval += localInterval;
+            setTimeLeft((timeLeft) => {
+                timer.current.timeLeft = timeLeft - localInterval;
+
+                return timer.current.timeLeft;
+            });
+        }
+
+        if (ts - timer.current.started < timer.current.timeToCount) {
+            timer.current.requestId = window.requestAnimationFrame(run);
+        } else {
+            timer.current = {};
+            setTimeLeft(0);
+        }
+    };
+
+    const pause = React.useCallback(
+        () => {
+            window.cancelAnimationFrame(timer.current.requestId);
+            timer.current.started = null;
+            timer.current.lastInterval = null;
+            timer.current.timeToCount = timer.current.timeLeft;
+
+            clearInterval(trackingInterval);
+        },
+        [],
+    );
+
+    const resume = React.useCallback(
+        () => {
+            if (!timer.current.started && timer.current.timeLeft > 0) {
                 window.cancelAnimationFrame(timer.current.requestId);
-
-                const newTimeToCount = ttc !== undefined ? ttc : timeToCount;
-                timer.current.started = null;
-                timer.current.lastInterval = null;
-                timer.current.timeToCount = newTimeToCount;
                 timer.current.requestId = window.requestAnimationFrame(run);
-
-                setTimeLeft(newTimeToCount);
-            },
-            [],
-        );
-
-        const run = (ts) => {
-            if (!timer.current.started) {
-                timer.current.started = ts;
-                timer.current.lastInterval = ts;
             }
+        },
+        [],
+    );
 
-            const localInterval = Math.min(interval, (timer.current.timeLeft || Infinity));
-            if ((ts - timer.current.lastInterval) >= localInterval) {
-                timer.current.lastInterval += localInterval;
-                setTimeLeft((timeLeft) => {
-                    timer.current.timeLeft = timeLeft - localInterval;
-
-                    if (finishFocusTime) {
-                        setTimerPercentage(timer.current.timeLeft / defaultBreakTime * 100);
-                    } else {
-                        setTimerPercentage(timer.current.timeLeft / defaultFocusTime * 100);
-                    }
-
-                    return timer.current.timeLeft;
-                });
-            }
-
-            if (ts - timer.current.started < timer.current.timeToCount) {
-                timer.current.requestId = window.requestAnimationFrame(run);
-            } else {
+    const reset = React.useCallback(
+        () => {
+            if (timer.current.timeLeft) {
+                window.cancelAnimationFrame(timer.current.requestId);
                 timer.current = {};
                 setTimeLeft(0);
+            }
+        },
+        [],
+    );
 
-                if (graceTime.count > 0) {
-                    restart(graceTime.time);
-                } else {
+    const actions = React.useMemo(
+        () => ({ start, pause, resume, reset }),
+        [],
+    );
 
-                    if (finishFocusTime) {
-                        setStatus("Stay Focused");
-                        restart(defaultFocusTime);
-                        setFinishFocusTime(false);
+    React.useEffect(() => {
+        return () => window.cancelAnimationFrame(timer.current.requestId);
+    }, []);
+
+    // return [timeLeft, actions];
+    // };
+
+    // const [timeLeft, { start, pause, resume, reset }] = useCountDown(defaultFocusTime, 1000);
+
+
+
+
+    useEffect(() => {
+        start(defaultFocusTime);
+    }, []);
+
+    useEffect(() => {
+        trackingInterval = setInterval(() => {
+            // console.log(status, timer.current.timeLeft);
+
+            if (status === "Stay Focused") {
+                setTimerPercentage(timer.current.timeLeft / defaultFocusTime * 100);
+            } else if (status === "Grace Time") {
+                setTimerPercentage(timer.current.timeLeft / graceTime.time * 100);
+            } else {
+                setTimerPercentage(timer.current.timeLeft / defaultBreakTime * 100);
+            }
+
+            if (timer.current.timeLeft === undefined) {
+                if (status === "Stay Focused") {
+                    log
+                    if (graceTime.count > 0) {
+                        setStatus("Grace Time");
+                        restart(graceTime.time);
                     } else {
                         setStatus("Break");
                         restart(defaultBreakTime);
-                        setFinishFocusTime(true);
                     }
-
-                    setIsStart(false);
+                } else {
+                    setStatus("Stay Focused");
+                    restart(defaultFocusTime);
                 }
+
+
+                // if (status === "Stay Focused") {
+                //     if (graceTime.count > 0) {
+                //         setStatus("Grace Time");
+                //         restart(graceTime.time);
+                //     } else {
+                //         setStatus("Break");
+                //         restart(defaultBreakTime);
+                //     }
+                // } else {
+                //     setStatus("Stay Focused");
+                //     restart(defaultFocusTime);
+                // }
             }
-        };
+        }, 1000);
+        // if (!timer.current.started) {
+        //     timer.current.started = ts;
+        //     timer.current.lastInterval = ts;
+        // }
 
-        const pause = React.useCallback(
-            () => {
-                window.cancelAnimationFrame(timer.current.requestId);
-                timer.current.started = null;
-                timer.current.lastInterval = null;
-                timer.current.timeToCount = timer.current.timeLeft;
-            },
-            [],
-        );
+        // const localInterval = Math.min(interval, (timer.current.timeLeft || Infinity));
+        // if ((ts - timer.current.lastInterval) >= localInterval) {
+        //     timer.current.lastInterval += localInterval;
+        //     // setTimeLeft((timeLeft) => {
+        //     setTrackingTime((timeLeft) => {
+        //         timer.current.timeLeft = timeLeft - localInterval;
 
-        const resume = React.useCallback(
-            () => {
-                if (!timer.current.started && timer.current.timeLeft > 0) {
-                    window.cancelAnimationFrame(timer.current.requestId);
-                    timer.current.requestId = window.requestAnimationFrame(run);
-                }
-            },
-            [],
-        );
+        //         console.log(timer.current.timeLeft);
 
-        const reset = React.useCallback(
-            () => {
-                if (timer.current.timeLeft) {
-                    window.cancelAnimationFrame(timer.current.requestId);
-                    timer.current = {};
-                    setTimeLeft(0);
-                }
-            },
-            [],
-        );
+        //         // console.log(status);
 
-        const actions = React.useMemo(
-            () => ({ start, pause, resume, reset }),
-            [],
-        );
+        //         // if (finishFocusTime) {
+        //         // if (status === "Stay Focused") {
+        //         //     setTimerPercentage(timer.current.timeLeft / defaultFocusTime * 100);
+        //         // } else if (status === "Grace Time") {
+        //         //     setTimerPercentage(timer.current.timeLeft / graceTime.time * 100);
+        //         // } else {
+        //         //     setTimerPercentage(timer.current.timeLeft / defaultBreakTime * 100);
+        //         // }
 
-        React.useEffect(() => {
-            return () => window.cancelAnimationFrame(timer.current.requestId);
-        }, []);
+        //         return timer.current.timeLeft;
+        //     });
+        // }
 
-        return [timeLeft, actions];
-    };
+        // if (ts - timer.current.started < timer.current.timeToCount) {
+        //     timer.current.requestId = window.requestAnimationFrame(run);
+        // } else {
+        //     timer.current = {};
+        //     setTrackingTime(0);
+        //     // setTimeLeft(0);
 
-    const [timeLeft, { start, pause, resume, reset }] = useCountDown(defaultFocusTime, 1000);
+        //     // if (graceTime.count > 0) { add back
+        //     //     restart(graceTime.time);
+        //     // } else {
 
-    useEffect(() => {
-        start();
-    }, []);
+        //     // if (finishFocusTime) {
+        //     //     setStatus("Stay Focused");
+        //     //     restart(defaultFocusTime);
+        //     //     setFinishFocusTime(false);
+        //     // } else {
+        //     //     setStatus("Break");
+        //     //     restart(defaultBreakTime);
+        //     //     setFinishFocusTime(true);
+        //     // }
+
+        //     // setIsStart(false);
+
+        //     // if (status === "Stay Focused") {
+        //     //     if (graceTime.count > 0) {
+        //     //         setStatus("Grace Time");
+        //     //         restart(graceTime.time);
+        //     //     } else {
+        //     //         setStatus("Break");
+        //     //         restart(defaultBreakTime);
+        //     //     }
+        //     // } else {
+        //     //     setStatus("Stay Focused");
+        //     //     restart(defaultFocusTime);
+        //     // }
+        //     // }
+        // }
+    });
+
+    // if (status === "Grace Time" && timeLeft === 0) {
+    //     setGraceTime({
+    //         count: 0,
+    //         time: 0
+    //     });
+    // }
 
     const progressBarStyle = {
         pathTransitionDuration: 0.5,
@@ -254,7 +358,7 @@ function App() {
                     </Zoom>
 
                     <Zoom in={true}>
-                        <ReplayIcon fontSize="large" name="reset" style={resetIconStyle} onClick={handleResetClick} /> 
+                        <ReplayIcon fontSize="large" name="reset" style={resetIconStyle} onClick={handleResetClick} />
                         {/* make it only clickable during "stay focused" moments */}
                     </Zoom>
                 </div>
