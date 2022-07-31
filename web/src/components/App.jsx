@@ -10,8 +10,6 @@ import ReplayIcon from '@mui/icons-material/Replay';
 import Replay from "@mui/icons-material/Replay";
 
 function App() {
-    let trackingInterval;
-
     // const defaultFocusTime = 60 * 25;
     const defaultFocusTime = 5 * 1000;
     // const defaultBreakTime = 60 * 5 * 1000;
@@ -74,6 +72,20 @@ function App() {
         } else {
             timer.current = {};
             setTimeLeft(0);
+
+
+            if (status === "Stay Focused") {
+                if (graceTime.count > 0) {
+                    setStatus("Grace Time");
+                    // restart(graceTime.time);
+                } else {
+                    setStatus("Break");
+                    // restart(defaultBreakTime);
+                }
+            } else {
+                setStatus("Stay Focused");
+                // restart(defaultFocusTime);
+            }
         }
     };
 
@@ -83,8 +95,6 @@ function App() {
             timer.current.started = null;
             timer.current.lastInterval = null;
             timer.current.timeToCount = timer.current.timeLeft;
-
-            clearInterval(trackingInterval);
         },
         [],
     );
@@ -119,21 +129,13 @@ function App() {
         return () => window.cancelAnimationFrame(timer.current.requestId);
     }, []);
 
-    // return [timeLeft, actions];
-    // };
-
-    // const [timeLeft, { start, pause, resume, reset }] = useCountDown(defaultFocusTime, 1000);
-
-
-
-
     useEffect(() => {
         start(defaultFocusTime);
     }, []);
 
     useEffect(() => {
-        trackingInterval = setInterval(() => {
-            // console.log(status, timer.current.timeLeft);
+        setTimeout(() => {
+            console.log(timer.current.timeLeft);
 
             if (status === "Stay Focused") {
                 setTimerPercentage(timer.current.timeLeft / defaultFocusTime * 100);
@@ -145,108 +147,19 @@ function App() {
 
             if (timer.current.timeLeft === undefined) {
                 if (status === "Stay Focused") {
-                    log
                     if (graceTime.count > 0) {
-                        setStatus("Grace Time");
                         restart(graceTime.time);
                     } else {
-                        setStatus("Break");
                         restart(defaultBreakTime);
                     }
+                } else if (status === "Grace Time") {
+                    restart(defaultBreakTime);
                 } else {
-                    setStatus("Stay Focused");
                     restart(defaultFocusTime);
                 }
-
-
-                // if (status === "Stay Focused") {
-                //     if (graceTime.count > 0) {
-                //         setStatus("Grace Time");
-                //         restart(graceTime.time);
-                //     } else {
-                //         setStatus("Break");
-                //         restart(defaultBreakTime);
-                //     }
-                // } else {
-                //     setStatus("Stay Focused");
-                //     restart(defaultFocusTime);
-                // }
             }
         }, 1000);
-        // if (!timer.current.started) {
-        //     timer.current.started = ts;
-        //     timer.current.lastInterval = ts;
-        // }
-
-        // const localInterval = Math.min(interval, (timer.current.timeLeft || Infinity));
-        // if ((ts - timer.current.lastInterval) >= localInterval) {
-        //     timer.current.lastInterval += localInterval;
-        //     // setTimeLeft((timeLeft) => {
-        //     setTrackingTime((timeLeft) => {
-        //         timer.current.timeLeft = timeLeft - localInterval;
-
-        //         console.log(timer.current.timeLeft);
-
-        //         // console.log(status);
-
-        //         // if (finishFocusTime) {
-        //         // if (status === "Stay Focused") {
-        //         //     setTimerPercentage(timer.current.timeLeft / defaultFocusTime * 100);
-        //         // } else if (status === "Grace Time") {
-        //         //     setTimerPercentage(timer.current.timeLeft / graceTime.time * 100);
-        //         // } else {
-        //         //     setTimerPercentage(timer.current.timeLeft / defaultBreakTime * 100);
-        //         // }
-
-        //         return timer.current.timeLeft;
-        //     });
-        // }
-
-        // if (ts - timer.current.started < timer.current.timeToCount) {
-        //     timer.current.requestId = window.requestAnimationFrame(run);
-        // } else {
-        //     timer.current = {};
-        //     setTrackingTime(0);
-        //     // setTimeLeft(0);
-
-        //     // if (graceTime.count > 0) { add back
-        //     //     restart(graceTime.time);
-        //     // } else {
-
-        //     // if (finishFocusTime) {
-        //     //     setStatus("Stay Focused");
-        //     //     restart(defaultFocusTime);
-        //     //     setFinishFocusTime(false);
-        //     // } else {
-        //     //     setStatus("Break");
-        //     //     restart(defaultBreakTime);
-        //     //     setFinishFocusTime(true);
-        //     // }
-
-        //     // setIsStart(false);
-
-        //     // if (status === "Stay Focused") {
-        //     //     if (graceTime.count > 0) {
-        //     //         setStatus("Grace Time");
-        //     //         restart(graceTime.time);
-        //     //     } else {
-        //     //         setStatus("Break");
-        //     //         restart(defaultBreakTime);
-        //     //     }
-        //     // } else {
-        //     //     setStatus("Stay Focused");
-        //     //     restart(defaultFocusTime);
-        //     // }
-        //     // }
-        // }
-    });
-
-    // if (status === "Grace Time" && timeLeft === 0) {
-    //     setGraceTime({
-    //         count: 0,
-    //         time: 0
-    //     });
-    // }
+    }, [timer.current.timeLeft]);
 
     const progressBarStyle = {
         pathTransitionDuration: 0.5,
