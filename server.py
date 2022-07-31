@@ -190,13 +190,13 @@ def send_spectrogram(path):
 
 
 @socketio.on('connect')
-def on_join(data):
-    print('Client joined from ' + request.remote_addr)
+def on_connect():
+    print('Client connected from ' + request.remote_addr)
 
 
 @socketio.on('disconnect')
-def on_leave(data):
-    print('Client left from ' + request.remote_addr)
+def on_disconnect():
+    print('Client disconnected from ' + request.remote_addr)
 
 
 if __name__ == "__main__":
