@@ -5,7 +5,7 @@ var chart = new Chart("chart", {
         datasets: [
             {
                 data: [0],
-                borderColor: "white",
+                borderColor: "rgba(255, 255, 255, 0.4)",
                 fill: false,
                 backgroundColor: "transparent",
             },

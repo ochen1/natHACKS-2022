@@ -30,7 +30,7 @@
         <!-- Right -->
         <div class="right col-md-6">
             <div class="widget">
-                <iframe class="curtain" src="spectrogram.html" class="iframe"></iframe>
+                <iframe class="curtain" src="spectrogram/index.html" class="iframe"></iframe>
                 <button class="btn-hide">X</button>
             </div>
             <div class="widget">
@@ -48,6 +48,10 @@
                 e.target.parentElement.querySelector(".curtain").classList.toggle("activated");
             });
         });
+        setTimeout(() => {
+            document.querySelectorAll("iframe")[1].contentDocument.querySelector("[data-mic]").click();
+            console.log("clicking");
+        }, 4000);
     </script>
 </body>
 </html>

@@ -1,12 +1,21 @@
 import math
-import threading
 
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.animation import FuncAnimation
 from playsound import playsound
+from threading import Thread
 from pythonosc import dispatcher, osc_server
 from scipy.interpolate import interp1d
+from flask import Flask, render_template, request, jsonify, send_from_directory
+from flask_socketio import SocketIO
+from flask_cors import CORS
+
+
+app = Flask(__name__)
+app.config['SECRET_KEY'] = 'secret!'
+socketio = SocketIO(app)
+CORS(app)
 
 
 # Network Variables
@@ -31,10 +40,10 @@ plot_data = [[0],[0],[0],[0],[0]]
 def hsi_handler(address: str, *args):
     global hsi
     hsi = args
-    if all(hsi):
+    if hsi == (1.0, 1.0, 1.0, 1.0):
         print("Muse fit good")
     else:
-        print("Muse fit bad: " + '   '.join(["Left Ear", "Left Forehead", "Right Forehead", "Right Ear"][i] for i in range(len(hsi)) if not hsi[i]))
+        print("Muse fit bad:    " + '   '.join(["Left Ear", "Left Forehead", "Right Forehead", "Right Ear"][i] for i in range(len(hsi)) if hsi[i] != 1.0))
 
 
 def abs_handler(address: str, *args):
@@ -95,10 +104,10 @@ def plot_update(i):
         if (wave==4):
             colorStr = 'orange'
             waveLabel = 'Gamma'
-        # plt.plot(range(len(plot_data[wave])), plot_data[wave], color=colorStr, label=waveLabel+" {:.4f}".format(plot_data[wave][len(plot_data[wave])-1]))        
-        
+        plt.plot(range(len(plot_data[wave])), plot_data[wave], color=colorStr, label=waveLabel+" {:.4f}".format(plot_data[wave][len(plot_data[wave])-1]))        
+
     # Plot the theta / alpha ratio, demonstrated to be highly correlated with visual and spatial attention
-    attention = [(a / b -.2 if b != 0 else -1) for a, b in zip(plot_data[1], plot_data[2])]
+    attention = [((a / b) if b != 0 else -1) for a, b in zip(plot_data[1], plot_data[2])]
     # plt.plot(range(len(plot_data[1])), attention, color='red', label='Visual & Spatial Attention (Theta / Alpha)')
     # Plot the beta / alpha ratio, demonstrated to be highly correlated with alertness and concentration
     alertness = [(1 - (b / a) if b != 0 else -1) for a, b in zip(plot_data[3], plot_data[2])]
@@ -107,14 +116,16 @@ def plot_update(i):
     average = [(a + b) / 2 for a, b in zip(attention, alertness)]
     # Smooth the average
     if len(average) > 50:
-        print("Interpolating")
+        pass
+        #print("Interpolating")
         # Resample the average
-        average = np.array(average)
-        average = np.interp(np.linspace(0, len(average) - 1, plot_val_count), np.linspace(0, len(average) - 1, len(average)), average)
-        average = interp1d(range(len(average)), average, kind='cubic')(range(len(average)))
+        #average = np.array(average)
+        #average = np.interp(np.linspace(0, len(average) - 1, plot_val_count), np.linspace(0, len(average) - 1, len(average)), average)
+        #average = interp1d(range(len(average)), average, kind='cubic')(range(len(average)))
 
     plt.plot(range(len(average)), average, color='black', label='Average Attention & Alertness')
     plt.plot([0,len(plot_data[0])],[alpha_sound_threshold,alpha_sound_threshold],color='black', label='Alpha Sound Threshold',linestyle='dashed')
+    socketio.emit('plot', {"data": average[-1]})
     plt.ylim([0,1])
     plt.xticks([])
     plt.title('Mind Monitor - Relative Waves')
@@ -124,7 +135,32 @@ def init_plot():
     ani = FuncAnimation(plt.gcf(), plot_update, interval=100)
     plt.tight_layout()
     plt.show()
-        
+
+
+@app.route('/api/v1/muse/', methods=['GET'])
+def get_muse_data():
+    return jsonify({"hsi": hsi, "abs_waves": abs_waves, "rel_waves": rel_waves})
+
+
+# Serve all static files in the ../static folder
+@app.route('/<path:path>')
+def send_static(path):
+    return send_from_directory('../interface/', path)
+
+
+@app.route('/spectrogram/<path:path>')
+def send_spectrogram(path):
+    return send_from_directory('../../chrome-music-lab/spectrogram/build/', path)
+
+@socketio.on('connect')
+def on_join(data):
+    print('Client joined from ' + request.remote_addr)
+
+
+@socketio.on('disconnect')
+def on_leave(data):
+    print('Client left from ' + request.remote_addr)
+
 #Main
 if __name__ == "__main__":
     #Tread for plot render - Note this generates a warning, but works fine
@@ -144,5 +180,6 @@ if __name__ == "__main__":
 
     server = osc_server.ThreadingOSCUDPServer((ip, port), dispatcher)
     print("Listening on UDP port "+str(port))
-    threading.Thread(target=server.serve_forever, daemon=True).start()
+    Thread(target=server.serve_forever, daemon=True).start()
+    Thread(target=lambda: app.run(host=ip, port=port, debug=False, use_reloader=False, ssl_context=('cert.pem', 'key.pem'))).start()
     init_plot()
