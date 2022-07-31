@@ -33,6 +33,9 @@ last_hsi = (-1, -1, -1, -1)
 abs_waves = [-1, -1, -1, -1, -1]
 rel_waves = [-1, -1, -1, -1,-1]
 publish_queue = Queue()
+attention = []
+alertness = []
+average = []
 
 # Plot Array
 plot_val_count = 200
@@ -139,7 +142,7 @@ def update_plot_vars(wave):
 
 # Update the plot
 def plot_update(_):
-    global plot_data
+    global plot_data, attention, alertness, average
 
     if len(plot_data[0]) < 10:
         return # Refuse to plot with less than 10 data points
@@ -250,6 +253,14 @@ address_list = set()
 def default_handler(address: str, *args):
     address_list.add(address)
     # print(address_list)
+
+
+@app.route('/api/v1/muse/eeg/is_attentive', methods=['GET'])
+def is_attentive():
+    print(average)
+    return jsonify({
+        "is_attentive": average[-1] > 0.5
+    })
 
 
 if __name__ == "__main__":
