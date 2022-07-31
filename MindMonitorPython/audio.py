@@ -11,15 +11,15 @@ from tkinter.tix import WINDOW
 import numpy as np
 import scipy.interpolate as interp
 import scipy.signal
-import sounddevice as sd
+import pyaudio
 from pythonosc import dispatcher, osc_server
 
 ip = "0.0.0.0"
 port = 5000
 
 
-queue = Queue(2)
-queue2 = []
+queue = []
+outputqueue = np.zeros(0)
 
 start = time.time()
 
@@ -30,38 +30,34 @@ WINDOW_SIZE_SAMPLES = int(800//3.2*WINDOW_SIZE_SECONDS)
 playing = False
 
 
-def callback(outdata, frames, time, status):
-    print("callback")
-    global queue
-    data = queue.get()
-    print(queue.qsize())
-    if queue.qsize() > 1:
-        queue = Queue(2)
-    data = data.reshape(outdata.shape)
-    # if len(data) < len(outdata):
-        # outdata[:len(data)] = data
-        # outdata[len(data):].fill(0)
-    # else:
-    outdata[:] = data
+def callback(indata, frames, time, status):
+    try:
+        global outputqueue
+        data = outputqueue[:frames * 4]
+        outputqueue = outputqueue[frames * 4:]
+        print("callback")
+        return data, pyaudio.paContinue 
+    except:
+        pass
 
-stream = sd.OutputStream(samplerate=44100, blocksize=44100, channels=1, dtype='float32', callback=callback)
-stream.start()
-
+p = pyaudio.PyAudio()
+stream = p.open(format=pyaudio.paFloat32, channels=1, rate=44100, output=True, frames_per_buffer=WINDOW_SIZE_SAMPLES, stream_callback=callback)
+stream.start_stream()
 
 def eeg_handler(address: str,*args):
-    global queue, queue2, playing, start
+    global outputqueue, queue, playing, start
     dateTimeObj = datetime.now()
     printStr = dateTimeObj.strftime("%Y-%m-%d %H:%M:%S.%f")
     for arg in args:
         printStr += ","+str(arg)
     #print(printStr)
-    queue2.append(sum(args)/len(args))
-    if len(queue2) >= WINDOW_SIZE_SAMPLES and playing == False:
+    queue.append(sum(args)/len(args))
+    if len(queue) >= WINDOW_SIZE_SAMPLES and playing == False:
         playing = True
         print(time.time()-start)
         start = time.time()
         # print("queue filled at time", time.time() - start)
-        print(min(queue2[:WINDOW_SIZE_SAMPLES]), max(queue2[:WINDOW_SIZE_SAMPLES]))
+        print(min(queue[:WINDOW_SIZE_SAMPLES]), max(queue[:WINDOW_SIZE_SAMPLES]))
         # These numbers in the queue are in the range of 0 to +2048 (?)
         # However, most of the time they are in the range of +600 to +900
         # The following code is an example that generates random sound (white noise):
@@ -73,8 +69,8 @@ def eeg_handler(address: str,*args):
         # Furthermore, EEG data is in the frequency range of 1Hz to 100Hz
         # However, sound data is in the frequency range of 440Hz to 880Hz
         # To do this, we need to fourier-transform the EEG data and bring up the frequency range to 440Hz to 880Hz
-        t = (np.float32(queue2[:WINDOW_SIZE_SAMPLES])/1000-0.7)*20
-        queue2 = queue2[WINDOW_SIZE_SAMPLES:]
+        t = (np.float32(queue[:WINDOW_SIZE_SAMPLES])/1000-0.7)*20
+        queue = queue[WINDOW_SIZE_SAMPLES:]
         playing = False
         t = scipy.signal.resample(t, 44100//3)
         t = np.fft.rfft(t)
@@ -84,9 +80,9 @@ def eeg_handler(address: str,*args):
         t = scipy.signal.resample(t, 44100)
         # Ensure that the sound is in the range of -1 to +1
         t = (t/2+0.5)*2-1
-        queue.put(t)
-        # sd.play(t, 44100)
-        # print("playing", t.max(), t.min())
+        # Play the sound
+        # stream.write(t)
+        outputqueue = np.concatenate((outputqueue, t))
 
     
 if __name__ == "__main__":

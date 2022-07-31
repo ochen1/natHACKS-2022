@@ -20,7 +20,8 @@ CORS(app)
 
 # Network Variables
 ip = "0.0.0.0"
-port = 5000
+port = 3000
+uport = 5000
 
 # Muse Variables
 hsi = [4,4,4,4]
@@ -40,6 +41,7 @@ plot_data = [[0],[0],[0],[0],[0]]
 def hsi_handler(address: str, *args):
     global hsi
     hsi = args
+    print(hsi)
     if hsi == (1.0, 1.0, 1.0, 1.0):
         print("Muse fit good")
     else:
@@ -150,7 +152,7 @@ def send_static(path):
 
 @app.route('/spectrogram/<path:path>')
 def send_spectrogram(path):
-    return send_from_directory('../../chrome-music-lab/spectrogram/build/', path)
+    return send_from_directory('../spectrogram/build/', path)
 
 @socketio.on('connect')
 def on_join(data):
@@ -179,7 +181,8 @@ if __name__ == "__main__":
     dispatcher.map("/muse/elements/gamma_absolute", abs_handler,4)
 
     server = osc_server.ThreadingOSCUDPServer((ip, port), dispatcher)
-    print("Listening on UDP port "+str(port))
+    print("Listening on UDP port "+str(uport))
     Thread(target=server.serve_forever, daemon=True).start()
-    Thread(target=lambda: app.run(host=ip, port=port, debug=False, use_reloader=False, ssl_context=('cert.pem', 'key.pem'))).start()
+    # Thread(target=lambda: app.run(host=ip, port=port, debug=False, use_reloader=False, ssl_context=('cert.pem', 'key.pem'))).start()
+    # Thread(target=lambda: socketio.run(app, host=ip, port=port, debug=False, use_reloader=False)).start()
     init_plot()
