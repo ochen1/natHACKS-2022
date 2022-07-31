@@ -13,10 +13,8 @@ function App() {
     // const defaultFocusTime = 60 * 25;
     const defaultFocusTime = 5 * 1000;
     // const defaultBreakTime = 60 * 5 * 1000;
-    const defaultBreakTime = 60 * 1000;
+    const defaultBreakTime = 15 * 1000;
 
-    const [focusTime, setFocusTime] = useState(defaultFocusTime);
-    const [restTime, setRestTime] = useState(defaultBreakTime);
     const [graceTime, setGraceTime] = useState({
         // count: 0,
         // time: 0, (make this count * 60 * 5 * 1000 dynamically)
@@ -72,20 +70,6 @@ function App() {
         } else {
             timer.current = {};
             setTimeLeft(0);
-
-
-            if (status === "Stay Focused") {
-                if (graceTime.count > 0) {
-                    setStatus("Grace Time");
-                    // restart(graceTime.time);
-                } else {
-                    setStatus("Break");
-                    // restart(defaultBreakTime);
-                }
-            } else {
-                setStatus("Stay Focused");
-                // restart(defaultFocusTime);
-            }
         }
     };
 
@@ -120,11 +104,6 @@ function App() {
         [],
     );
 
-    const actions = React.useMemo(
-        () => ({ start, pause, resume, reset }),
-        [],
-    );
-
     React.useEffect(() => {
         return () => window.cancelAnimationFrame(timer.current.requestId);
     }, []);
@@ -148,13 +127,21 @@ function App() {
             if (timer.current.timeLeft === undefined) {
                 if (status === "Stay Focused") {
                     if (graceTime.count > 0) {
+                        setStatus("Grace Time");
                         restart(graceTime.time);
                     } else {
+                        setStatus("Break");
                         restart(defaultBreakTime);
                     }
                 } else if (status === "Grace Time") {
+                    setGraceTime({
+                        count: 0,
+                        time: 0
+                    });
+                    setStatus("Break");
                     restart(defaultBreakTime);
                 } else {
+                    setStatus("Stay Focused");
                     restart(defaultFocusTime);
                 }
             }
@@ -219,8 +206,6 @@ function App() {
     }
 
     function handleResetClick() {
-        setTimerPercentage(100);
-
         restart(defaultFocusTime);
     }
 
@@ -271,8 +256,11 @@ function App() {
                     </Zoom>
 
                     <Zoom in={true}>
-                        <ReplayIcon fontSize="large" name="reset" style={resetIconStyle} onClick={handleResetClick} />
-                        {/* make it only clickable during "stay focused" moments */}
+                        {
+                            status === "Stay Focused"
+                                ? <ReplayIcon fontSize="large" name="clickable" style={resetIconStyle} onClick={handleResetClick} />
+                                : <ReplayIcon fontSize="large" name="unclickable" style={resetIconStyle} />
+                        }
                     </Zoom>
                 </div>
             </div>
