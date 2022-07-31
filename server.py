@@ -221,7 +221,7 @@ if __name__ == "__main__":
     Thread(target=osc_server.serve_forever, daemon=True).start()
 
     print(f"HTTP Server: Listening on TCP port {http_port}")
-    Thread(target=lambda: socketio.run(app, host=ip, port=http_port, debug=False, use_reloader=False, ssl_context=('ssl/cert.pem', 'ssl/key.pem')), daemon=True).start()
+    Thread(target=lambda: socketio.run(app, host=ip, port=http_port, debug=False, use_reloader=False, certfile='ssl/cert.pem', keyfile='ssl/key.pem'), daemon=True).start()
     
     print(f"Plot: Starting")
     init_plot()
