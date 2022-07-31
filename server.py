@@ -198,12 +198,12 @@ def get_muse_data():
 
 @app.route('/<path:path>')
 def send_static(path):
-    return send_from_directory('../interface/', path)
+    return send_from_directory('interface/', path)
 
 
 @app.route('/spectrogram/<path:path>')
 def send_spectrogram(path):
-    return send_from_directory('../spectrogram/build/', path)
+    return send_from_directory('spectrogram/build/', path)
 
 
 @socketio.on('connect')
