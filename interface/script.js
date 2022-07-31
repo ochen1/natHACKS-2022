@@ -15,8 +15,8 @@ var chart = new Chart("chart", {
         responsive: false,
         title: {
             display: true,
-            text: 'Custom Chart Title',
-            fontColor: '#40f2f9',
+            text: 'Average Attentiveness and Alertness',
+            fontColor: 'rgba(255, 255, 255, 0.87)',
         },
         legend: {
             display: false,
@@ -33,7 +33,7 @@ var chart = new Chart("chart", {
             yAxes: [
                 {
                     ticks: {
-                        fontColor: '#40f2f9',
+                        fontColor: 'rgba(255, 255, 255, 0.87)',
                         min: 0,
                         max: 1,
                         stepSize: 0.1,
