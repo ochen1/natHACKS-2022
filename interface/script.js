@@ -34,8 +34,8 @@ var chart = new Chart("chart", {
                 {
                     ticks: {
                         fontColor: 'rgba(255, 255, 255, 0.87)',
-                        suggestedmin: 0,
-                        suggestedmax: 1,
+                        suggestedMin: 0,
+                        suggestedMax: 1,
                         stepSize: 0.1,
                     }
                 }
@@ -53,7 +53,7 @@ socket.addEventListener('message', (event) => {
     console.log(event.data);
     chart.data.labels.push(chart.data.labels[chart.data.labels.length - 1] + 1);
     chart.data.datasets[0].data.push(event.data);
-    if (chart.data.labels.length > 100) {
+    if (chart.data.labels.length > 40) {
         chart.data.labels.shift();
         chart.data.datasets[0].data.shift();
     }
