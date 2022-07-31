@@ -1,16 +1,20 @@
 import math
+import time
+from threading import Thread
 
 import matplotlib.pyplot as plt
 import numpy as np
+import scipy
+import scipy.signal
+import sounddevice as sd
+from flask import Flask, jsonify, render_template, request, send_from_directory
+from flask_cors import CORS
+from flask_socketio import SocketIO
 from matplotlib.animation import FuncAnimation
 from playsound import playsound
-from threading import Thread
-from pythonosc import dispatcher, osc_server
+from pythonosc import dispatcher
+from pythonosc.osc_server import ThreadingOSCUDPServer
 from scipy.interpolate import interp1d
-from flask import Flask, render_template, request, jsonify, send_from_directory
-from flask_socketio import SocketIO
-from flask_cors import CORS
-
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret!'
@@ -20,8 +24,8 @@ CORS(app)
 
 # Network Variables
 ip = "0.0.0.0"
-port = 3000
-uport = 5000
+http_port = 8080 # /tcp
+osc_port = 5000 # /udp
 
 # Muse Variables
 hsi = [4,4,4,4]
@@ -36,8 +40,17 @@ sound_file = "bell.mp3"
 plot_val_count = 200
 plot_data = [[0],[0],[0],[0],[0]]
 
+# Audio Data Queue
+queue = []
+start = time.time()
 
-# Muse Data handlers
+# Audio Variables
+WINDOW_SIZE_SECONDS = 1
+WINDOW_SIZE_SAMPLES = 800//3.1*WINDOW_SIZE_SECONDS
+playing = False
+
+
+# Horseshoe handler
 def hsi_handler(address: str, *args):
     global hsi
     hsi = args
@@ -48,6 +61,7 @@ def hsi_handler(address: str, *args):
         print("Muse fit bad:    " + '   '.join(["Left Ear", "Left Forehead", "Right Forehead", "Right Ear"][i] for i in range(len(hsi)) if hsi[i] != 1.0))
 
 
+# Frequency band handler
 def abs_handler(address: str, *args):
     global hsi, abs_waves, rel_waves
     wave = args[0][0]
@@ -70,6 +84,43 @@ def abs_handler(address: str, *args):
         update_plot_vars(wave)
         if (wave==2 and len(plot_data[0])>10): #Wait until we have at least 10 values to start testing
             test_alpha_relative()
+
+
+# Raw EEG data handler
+def eeg_handler(address: str, *args):
+    global queue, playing
+    queue.append(sum(args) / len(args))
+    if len(queue) == WINDOW_SIZE_SAMPLES + 1:
+        print("Queue filled at time", time.time() - start)
+        print(min(queue), max(queue))
+        # These numbers in the queue are in the range of 0 to +2048 (?)
+        # However, most of the time they are in the range of +600 to +900
+        # The following code is an example that generates random sound (white noise):
+        # sd.play(np.float32([random.randint(1, 10)/10 for i in range(44100)]), 44100)
+        # We need to convert the EEG data in the queue to a range of -1 to +1 for the sound device
+        # t = np.float32(queue)
+        # t = interp.interp1d([600, 1000], [-1, 1])(queue)
+        # t = interp.interp1d(np.linspace(0, WINDOW_SIZE_SAMPLES, len(t)), t, kind='cubic')(np.linspace(0, WINDOW_SIZE_SAMPLES, 44100))
+        # Furthermore, EEG data is in the frequency range of 1Hz to 100Hz
+        # However, sound data is in the frequency range of 440Hz to 880Hz
+        # To do this, we need to fourier-transform the EEG data and bring up the frequency range to 440Hz to 880Hz
+        t = (np.float32(queue)/1000-0.7)*20
+        queue=[]
+        t = scipy.signal.resample(t, 44100//3)
+        t = np.fft.rfft(t)
+        t = np.roll(t, 4000//20)
+        t[0:4000//20] = 0
+        t = np.fft.irfft(t)
+        t = scipy.signal.resample(t, 44100)
+        # Ensure that the sound is in the range of -1 to +1
+        t = (t/2+0.5)*2-1
+        while playing == True:
+            pass
+        playing = True
+        sd.play(t, 44100//WINDOW_SIZE_SECONDS, blocking=True)
+        # sd.play(t, 44100)
+        # print("playing", t.max(), t.min())
+        playing = False
 
 #Audio test
 def test_alpha_relative():
@@ -132,6 +183,7 @@ def plot_update(i):
     plt.xticks([])
     plt.title('Mind Monitor - Relative Waves')
     plt.legend(loc='upper left')
+
     
 def init_plot():
     ani = FuncAnimation(plt.gcf(), plot_update, interval=100)
@@ -144,7 +196,6 @@ def get_muse_data():
     return jsonify({"hsi": hsi, "abs_waves": abs_waves, "rel_waves": rel_waves})
 
 
-# Serve all static files in the ../static folder
 @app.route('/<path:path>')
 def send_static(path):
     return send_from_directory('../interface/', path)
@@ -153,6 +204,7 @@ def send_static(path):
 @app.route('/spectrogram/<path:path>')
 def send_spectrogram(path):
     return send_from_directory('../spectrogram/build/', path)
+
 
 @socketio.on('connect')
 def on_join(data):
@@ -163,26 +215,30 @@ def on_join(data):
 def on_leave(data):
     print('Client left from ' + request.remote_addr)
 
-#Main
-if __name__ == "__main__":
-    #Tread for plot render - Note this generates a warning, but works fine
-    #thread = threading.Thread(target=init_plot)
-    #thread.daemon = True
-    #thread.start()
-    
-    #Init Muse Listeners    
-    dispatcher = dispatcher.Dispatcher()
-    dispatcher.map("/muse/elements/horseshoe", hsi_handler)
-    
-    dispatcher.map("/muse/elements/delta_absolute", abs_handler,0)
-    dispatcher.map("/muse/elements/theta_absolute", abs_handler,1)
-    dispatcher.map("/muse/elements/alpha_absolute", abs_handler,2)
-    dispatcher.map("/muse/elements/beta_absolute", abs_handler,3)
-    dispatcher.map("/muse/elements/gamma_absolute", abs_handler,4)
 
-    server = osc_server.ThreadingOSCUDPServer((ip, port), dispatcher)
-    print("Listening on UDP port "+str(uport))
-    Thread(target=server.serve_forever, daemon=True).start()
-    # Thread(target=lambda: app.run(host=ip, port=port, debug=False, use_reloader=False, ssl_context=('cert.pem', 'key.pem'))).start()
-    # Thread(target=lambda: socketio.run(app, host=ip, port=port, debug=False, use_reloader=False)).start()
+if __name__ == "__main__":
+    dispatcher = dispatcher.Dispatcher()
+
+    # Horseshoe
+    dispatcher.map("/muse/elements/horseshoe", hsi_handler)
+
+    # Absolute waves
+    dispatcher.map("/muse/eeg", eeg_handler)
+    
+    # Frequency bands
+    dispatcher.map("/muse/elements/delta_absolute", abs_handler, 0)
+    dispatcher.map("/muse/elements/theta_absolute", abs_handler, 1)
+    dispatcher.map("/muse/elements/alpha_absolute", abs_handler, 2)
+    dispatcher.map("/muse/elements/beta_absolute",  abs_handler, 3)
+    dispatcher.map("/muse/elements/gamma_absolute", abs_handler, 4)
+
+    osc_server = ThreadingOSCUDPServer((ip, http_port), dispatcher)
+
+    print(f"OSC Server: Listening on UDP port {osc_port}")
+    Thread(target=osc_server.serve_forever, daemon=True).start()
+
+    print(f"HTTP Server: Listening on TCP port {http_port}")
+    Thread(target=lambda: socketio.run(app, host=ip, port=http_port, debug=False, use_reloader=False, ssl_context=('cert.pem', 'key.pem')), daemon=True).start()
+    
+    print(f"Plot: Starting")
     init_plot()
