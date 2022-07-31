@@ -7,14 +7,12 @@ import numpy as np
 import scipy
 import scipy.signal
 import sounddevice as sd
-from flask import Flask, jsonify, render_template, request, send_from_directory
+from flask import Flask, jsonify, request, send_from_directory
 from flask_cors import CORS
 from flask_socketio import SocketIO
 from matplotlib.animation import FuncAnimation
-from playsound import playsound
 from pythonosc import dispatcher
 from pythonosc.osc_server import ThreadingOSCUDPServer
-from scipy.interpolate import interp1d
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret!'
