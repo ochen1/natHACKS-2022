@@ -1,11 +1,11 @@
+import json
 import math
-from queue import Queue
 import time
+from queue import Queue
 from threading import Thread
 
 import matplotlib.pyplot as plt
 import numpy as np
-import json
 import scipy
 import scipy.signal
 import sounddevice as sd
@@ -15,7 +15,6 @@ from flask_sock import Sock
 from matplotlib.animation import FuncAnimation
 from pythonosc import dispatcher
 from pythonosc.osc_server import ThreadingOSCUDPServer
-
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret!'
