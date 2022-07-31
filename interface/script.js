@@ -5,7 +5,13 @@ var chart = new Chart("chart", {
         datasets: [
             {
                 data: [0],
-                borderColor: "rgba(255, 255, 255, 0.4)",
+                borderColor: "rgba(0, 255, 0, 0.4)",
+                fill: false,
+                backgroundColor: "transparent",
+            },
+            {
+                data: [0],
+                borderColor: "rgba(0, 0, 255, 0.4)",
                 fill: false,
                 backgroundColor: "transparent",
             },
@@ -52,10 +58,12 @@ socket.addEventListener('open', () => {
 socket.addEventListener('message', (event) => {
     console.log(event.data);
     chart.data.labels.push(chart.data.labels[chart.data.labels.length - 1] + 1);
-    chart.data.datasets[0].data.push(event.data);
+    chart.data.datasets[0].data.push(event.data[0]);
+    chart.data.datasets[1].data.push(event.data[1]);
     if (chart.data.labels.length > 40) {
         chart.data.labels.shift();
         chart.data.datasets[0].data.shift();
+        chart.data.datasets[1].data.shift();
     }
     chart.update();
 });
