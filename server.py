@@ -32,10 +32,6 @@ hsi = [4,4,4,4]
 abs_waves = [-1,-1,-1,-1,-1]
 rel_waves = [-1,-1,-1,-1,-1]
 
-# Audio Variables
-alpha_sound_threshold = 0.6
-sound_file = "bell.mp3"
-
 # Plot Array
 plot_val_count = 200
 plot_data = [[0],[0],[0],[0],[0]]
@@ -55,7 +51,7 @@ def hsi_handler(address: str, *args):
     global hsi
     hsi = args
     print(hsi)
-    if hsi == (1.0, 1.0, 1.0, 1.0):
+    if hsi == (1, 1, 1, 1):
         print("Muse fit good")
     else:
         print("Muse fit bad:    " + '   '.join(["Left Ear", "Left Forehead", "Right Forehead", "Right Ear"][i] for i in range(len(hsi)) if hsi[i] != 1.0))
@@ -64,26 +60,30 @@ def hsi_handler(address: str, *args):
 # Frequency band handler
 def abs_handler(address: str, *args):
     global hsi, abs_waves, rel_waves
+
+    """
+    Waves:
+    0: Delta (δ): 1-4Hz
+    1: Theta (θ): 4-8Hz
+    2: Alpha (α): 7.5-13Hz
+    3: Beta (β): 13-30Hz
+    4: Gamma (γ): 30-44Hz
+    """
     wave = args[0][0]
+    good_sensor_count = sum(1 for v in hsi if v == 1)
     
-    if any(hsi):
+    if good_sensor_count:
         if len(args) == 2:
-            # OSC Stream Brainwaves = Average Onle
+            # OSC Stream Brainwaves = Average Only
             # Single value for all sensors, already filtered for good data
             abs_waves[wave] = args[1]
-        if (len(args)==5): #If OSC Stream Brainwaves = All Values
-            sumVals=0
-            countVals=0            
-            for i in [0,1,2,3]:
-                if hsi[i]==1: #Only use good sensors
-                    countVals+=1
-                    sumVals+=args[i+1]
-            abs_waves[wave] = sumVals/countVals
-            
+        if len(args) == 5:
+            # OSC Stream Brainwaves = All Sensors
+            # Value for each sensor, already filtered for good data
+            abs_waves[wave] = sum(v for i, v in enumerate(args[1:]) if hsi[i] == 1) / good_sensor_count
         rel_waves[wave] = math.pow(10,abs_waves[wave]) / (math.pow(10,abs_waves[0]) + math.pow(10,abs_waves[1]) + math.pow(10,abs_waves[2]) + math.pow(10,abs_waves[3]) + math.pow(10,abs_waves[4]))
+
         update_plot_vars(wave)
-        if (wave==2 and len(plot_data[0])>10): #Wait until we have at least 10 values to start testing
-            test_alpha_relative()
 
 
 # Raw EEG data handler
@@ -93,102 +93,87 @@ def eeg_handler(address: str, *args):
     if len(queue) == WINDOW_SIZE_SAMPLES + 1:
         print("Queue filled at time", time.time() - start)
         print(min(queue), max(queue))
-        # These numbers in the queue are in the range of 0 to +2048 (?)
-        # However, most of the time they are in the range of +600 to +900
-        # The following code is an example that generates random sound (white noise):
-        # sd.play(np.float32([random.randint(1, 10)/10 for i in range(44100)]), 44100)
-        # We need to convert the EEG data in the queue to a range of -1 to +1 for the sound device
-        # t = np.float32(queue)
+        # Raw EEG data uses the unit μV, in the range of 0 to +2048
+        # Most of the time, they are in the range of +600 to +900
+        # The sound device accepts values in the range of -1 to +1
+        # EEG data is in the frequency range of 1Hz to 100Hz
+        # Sound data is in the frequency range of 100Hz to 10,000Hz
+        # An example of an octave is the range of 440Hz to 880Hz
+
         # t = interp.interp1d([600, 1000], [-1, 1])(queue)
-        # t = interp.interp1d(np.linspace(0, WINDOW_SIZE_SAMPLES, len(t)), t, kind='cubic')(np.linspace(0, WINDOW_SIZE_SAMPLES, 44100))
-        # Furthermore, EEG data is in the frequency range of 1Hz to 100Hz
-        # However, sound data is in the frequency range of 440Hz to 880Hz
-        # To do this, we need to fourier-transform the EEG data and bring up the frequency range to 440Hz to 880Hz
-        t = (np.float32(queue)/1000-0.7)*20
-        queue=[]
-        t = scipy.signal.resample(t, 44100//3)
-        t = np.fft.rfft(t)
-        t = np.roll(t, 4000//20)
-        t[0:4000//20] = 0
-        t = np.fft.irfft(t)
-        t = scipy.signal.resample(t, 44100)
-        # Ensure that the sound is in the range of -1 to +1
-        t = (t/2+0.5)*2-1
-        while playing == True:
+        t = (np.float32(queue) / 1000 - 0.7) * 20
+        queue = [] # Clear the queue
+        t = scipy.signal.resample(t, 44100//3) # Frequency range stretching
+        t = np.fft.rfft(t) # Apply a real short-time fast Fourier transform
+        t = np.roll(t, 200) # Shift the frequency range upwards
+        t[:200] = 0 # Zero out the low frequencies
+        t = np.fft.irfft(t) # Apply an inverse real short-time fast Fourier transform
+        t = scipy.signal.resample(t, 44100) # Complete the frequency range stretching
+        t = (t/2+0.5)*2-1 # Ensure that the sound is in the range of -1 to +1
+
+        while playing == True: # Wait until the sound is finished playing
             pass
+
         playing = True
-        sd.play(t, 44100//WINDOW_SIZE_SECONDS, blocking=True)
-        # sd.play(t, 44100)
-        # print("playing", t.max(), t.min())
+        sd.play(t, 44100//WINDOW_SIZE_SECONDS, blocking=True) # Play the sound
         playing = False
 
-#Audio test
-def test_alpha_relative():
-    alpha_relative = rel_waves[2]
-    if (alpha_relative>alpha_sound_threshold):
-        print ("BEEP! Alpha Relative: "+str(alpha_relative))
-        playsound(sound_file)        
-    
-#Live plot
+
+# Update the plot data based on the EEG data
 def update_plot_vars(wave):
     global plot_data, rel_waves, plot_val_count
-    plot_data[wave].append(rel_waves[wave])
-    plot_data[wave] = plot_data[wave][-plot_val_count:]
+    plot_data[wave].append(rel_waves[wave]) # Add the new value to the plot data
+    plot_data[wave] = plot_data[wave][-plot_val_count:] # Update the plot data based on the EEG data
 
-def plot_update(i):
+
+# Update the plot
+def plot_update(_):
     global plot_data
-    global alpha_sound_threshold
-    if len(plot_data[0])<10:
-        return
-    plt.cla()
-    for wave in [0,1,2,3,4]:
-        if (wave==0):
-            colorStr = 'red'
-            waveLabel = 'Delta'
-        if (wave==1):
-            colorStr = 'purple'
-            waveLabel = 'Theta'
-        if (wave==2):
-            colorStr = 'blue'
-            waveLabel = 'Alpha'
-        if (wave==3):
-            colorStr = 'green'
-            waveLabel = 'Beta'
-        if (wave==4):
-            colorStr = 'orange'
-            waveLabel = 'Gamma'
-        plt.plot(range(len(plot_data[wave])), plot_data[wave], color=colorStr, label=waveLabel+" {:.4f}".format(plot_data[wave][len(plot_data[wave])-1]))        
+
+    if len(plot_data[0]) < 10:
+        return # Refuse to plot with less than 10 data points
+
+    plt.cla() # Clear the plot
+
+    for wave in [0, 1, 2, 3, 4]:
+        color, wave_name = [("red", "Delta"), ("purple", "Theta"), ("blue", "Alpha"), ("green", "Beta"), ("orange", "Gamma")][wave]
+        plt.plot(range(len(plot_data[wave])), plot_data[wave], color=color, label=f"{wave_name} {plot_data[wave][len(plot_data[wave])-1]:.4f}")
 
     # Plot the theta / alpha ratio, demonstrated to be highly correlated with visual and spatial attention
-    attention = [((a / b) if b != 0 else -1) for a, b in zip(plot_data[1], plot_data[2])]
-    # plt.plot(range(len(plot_data[1])), attention, color='red', label='Visual & Spatial Attention (Theta / Alpha)')
-    # Plot the beta / alpha ratio, demonstrated to be highly correlated with alertness and concentration
-    alertness = [(1 - (b / a) if b != 0 else -1) for a, b in zip(plot_data[3], plot_data[2])]
-    # plt.plot(range(len(plot_data[3])), alertness, color='green', label='Alertness & Concentration (Beta / Alpha)')
-    # Average the attention and alertness ratios
-    average = [(a + b) / 2 for a, b in zip(attention, alertness)]
-    # Smooth the average
-    if len(average) > 50:
-        pass
-        #print("Interpolating")
-        # Resample the average
-        #average = np.array(average)
-        #average = np.interp(np.linspace(0, len(average) - 1, plot_val_count), np.linspace(0, len(average) - 1, len(average)), average)
-        #average = interp1d(range(len(average)), average, kind='cubic')(range(len(average)))
+    attention = [((a / b) if abs(b) < 0.1 else 0.5) for a, b in zip(plot_data[1], plot_data[2])]
+    plt.plot(range(len(plot_data[1])), attention, color='red', label='Visual & Spatial Attention (Theta / Alpha)')
 
+    # Plot the beta / alpha ratio, demonstrated to be highly correlated with alertness and concentration
+    alertness = [(1 - (b / a) if abs(b) < 0.1 else 0.5) for a, b in zip(plot_data[3], plot_data[2])]
+    plt.plot(range(len(plot_data[3])), alertness, color='green', label='Alertness & Concentration (Beta / Alpha)')
+
+    # Plot the average of the attention and alertness ratios
+    average = [(a + b) / 2 for a, b in zip(attention, alertness)]
     plt.plot(range(len(average)), average, color='black', label='Average Attention & Alertness')
-    plt.plot([0,len(plot_data[0])],[alpha_sound_threshold,alpha_sound_threshold],color='black', label='Alpha Sound Threshold',linestyle='dashed')
+
+    # Plot the activation threshold
+    plt.plot([0, len(plot_data[0])], [0.5, 0.5], color='black', label='Activation Threshold', linestyle='dashed')
+
+    # Publish the most recently-added plot data (ratio average)
     socketio.emit('plot', {"data": average[-1]})
-    plt.ylim([0,1])
+
+    # Set the y-axis range
+    plt.ylim(0, 1)
+    # Set the x-axis ticks
     plt.xticks([])
-    plt.title('Mind Monitor - Relative Waves')
+
+    # Set the plot title
+    plt.title('Flowmodoro | All Metrics')
+
+    # Set the plot legend location
     plt.legend(loc='upper left')
 
-    
+
+# Start the plot
 def init_plot():
-    ani = FuncAnimation(plt.gcf(), plot_update, interval=100)
-    plt.tight_layout()
-    plt.show()
+    ani = FuncAnimation(plt.gcf(), plot_update, interval=100) # Update the plot every 100ms
+    plt.tight_layout() # Set the plot layout
+    plt.show() # Show the plot
 
 
 @app.route('/api/v1/muse/', methods=['GET'])
