@@ -59,6 +59,12 @@ var chart = new Chart("chart", {
                     }
                 }
             ]
+        },
+        tooltips: {
+            enabled: false,
+        },
+        hover: {
+            mode: null,
         }
     },
 });

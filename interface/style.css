@@ -93,14 +93,18 @@ iframe, canvas {
     background: transparent;
 }
 .btn-hide {
+    background-color: rgba(0, 0, 0, 0.4);
+    box-shadow: 0px 0px 2px 1px rgb(255, 0, 211), inset 0px 0px 2px 1px rgb(255, 0, 211);
+    border: 1px solid #fcfffb;
+    border-radius: 50%;
+    color: #fafafa;
     position: absolute;
-    top: 0;
+    top: 9px;
     right: 0;
-    opacity: 0.6;
     transition: opacity 200ms ease;
 }
 .btn-hide:hover {
-    opacity: 0.9;
+    background-color: rgba(0, 0, 0, 0.9);
 }
 .curtain {
     transition: opacity 200ms ease;
@@ -121,4 +125,10 @@ button.collapse-btn {
     box-shadow: 0px 0px 5px 2px #47e6f2, inset 0px 0px 5px 2px #47e6f2;
     border-radius: 50px;
     margin: 12px;
+}
+button.collapse-btn:hover {
+    background-color: rgba(0, 0, 0, 0.6);
+}
+button {
+    outline: none !important;
 }
