@@ -137,7 +137,8 @@ AnalyserView.prototype.initGL = function() {
 	// Translation in the x axis.
 	cameraController.zT = -2;
 
-	gl.clearColor(backgroundColor[0], backgroundColor[1], backgroundColor[2], backgroundColor[3]);
+	// gl.clearColor(backgroundColor[0], backgroundColor[1], backgroundColor[2], backgroundColor[3]);
+	gl.clearColor(0, 0, 0, 0);
 	gl.enable(gl.DEPTH_TEST);
 
 	// Initialization for the 2D visualizations
