@@ -123,7 +123,7 @@ def plot_update(_):
     plt.plot([0, len(plot_data[0])], [0.5, 0.5], color='black', label='Activation Threshold', linestyle='dashed')
 
     # Publish the most recently-added plot data (ratio average)
-    publish_value((attention[-1], alertness[-1]))
+    publish_value((attention[-1], alertness[-1], 0 if len(alertness) < 200 else sum(alertness) / len(alertness)))
 
     # Set the y-axis range
     plt.ylim(-1, 2)
@@ -211,9 +211,9 @@ def default_handler(address: str, *args):
 
 @app.route('/api/v1/muse/eeg/is_attentive', methods=['GET'])
 def is_attentive():
-    print(average)
     return jsonify({
-        "is_attentive": average[-1] > 0.5
+        "is_attentive": None if len(alertness) < 200 else sum(alertness) / len(alertness) > 1.6,
+        "specific_value": None if len(alertness) < 200 else sum(alertness) / len(alertness),
     })
 
 
@@ -245,12 +245,12 @@ if __name__ == "__main__":
 
     Thread(target=publish_value_task, daemon=True).start()
 
-    if False:
+    if True:
         def random_data():
             import random
             while True:
                 print("WARNING: Sending random data!")
-                publish_value(random.random())
+                publish_value((random.random(), random.random(), random.random()))
                 time.sleep(0.1)
         Thread(target=random_data, daemon=True).start()
     
