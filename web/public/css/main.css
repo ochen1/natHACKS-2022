@@ -1,0 +1,259 @@
+* {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+  font-family: "Noto Sans", "Montserrat", sans-serif;
+  color: #a7abae;
+  text-align: center;
+}
+
+h1 {
+  font-weight: 400;
+  font-size: 3rem;
+}
+
+p {
+  font-size: 1.3rem;
+}
+
+a {
+  text-decoration: none;
+  font-size: 1.3rem;
+}
+
+hr {
+  border: none;
+  border-top: 1px solid rgba(167, 171, 174, 0.05);
+  width: 100%;
+}
+
+body {
+  background-color: #111d25;
+  height: 100vh;
+  width: 100vw;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+body .container {
+  margin: auto;
+  width: 30rem;
+}
+body .container nav {
+  margin: 0 auto 2.5rem;
+  width: 25rem;
+  border-bottom: 2px solid rgba(167, 171, 174, 0.05);
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  align-items: center;
+}
+body .container nav .item {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding-bottom: 0.5rem;
+  transform: translateY(2px);
+  cursor: pointer;
+}
+body .container nav .item.clicked {
+  padding-bottom: calc(0.5rem - 2px);
+  border-bottom: 2px solid #0098f7;
+}
+body .container nav .item svg {
+  font-size: 2rem;
+  margin-bottom: 0.3rem;
+}
+body .container nav .item p.item-description {
+  font-size: 1rem;
+}
+body .container .timer-container .progress-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+}
+body .container .timer-container .progress-container .progress {
+  margin: auto;
+  width: 18rem;
+}
+body .container .timer-container .progress-container .progress-text h1 {
+  color: #0098f7;
+}
+body .container .timer-container .progress-container .progress-text .status p {
+  color: #a7abae;
+}
+body .container .timer-container .list {
+  background-color: #1c2830;
+  border: 1px solid rgba(167, 171, 174, 0.05);
+  padding: 0.6rem 0.4rem 1.1rem;
+  width: 18rem;
+  margin: 2.5rem auto;
+}
+body .container .timer-container .list .task-container {
+  width: 100%;
+}
+body .container .timer-container .list .task-container div {
+  margin: 0.5rem 1rem;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+body .container .timer-container .list .task-container div p {
+  font-size: 1rem;
+}
+body .container .timer-container .list .task-container div svg {
+  font-size: 1.4rem;
+  cursor: pointer;
+}
+body .container .timer-container .list hr {
+  margin: 1rem auto 0.7rem;
+}
+body .container .timer-container .list .input-container input {
+  background: none;
+  outline: none;
+  border: none;
+  border-bottom: 2px solid rgba(167, 171, 174, 0.5);
+  transition: 50ms border-bottom linear;
+  font-size: 1rem;
+  width: 10rem;
+  margin-right: 0.5rem;
+}
+body .container .timer-container .list .input-container input:focus {
+  border-bottom: 2px solid #a7abae;
+}
+body .container .timer-container .list .input-container button {
+  outline: none;
+  background: none;
+  border: none;
+  font-size: 1.3rem;
+  cursor: pointer;
+}
+body .container .timer-container .footer {
+  position: -webkit-sticky;
+  position: sticky;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+}
+body .container .timer-container .footer .session-count-container {
+  position: relative;
+}
+body .container .timer-container .footer .session-count-container p {
+  font-size: 1.8rem;
+  font-weight: 500;
+  margin-bottom: 1.7rem;
+}
+body .container .timer-container .footer .session-count-container p span {
+  display: none;
+  position: absolute;
+  left: -11rem;
+  top: -0.2rem;
+  padding: 0.4rem 0.2rem;
+  background-color: #1c2830;
+  border: rgba(167, 171, 174, 0.05);
+  font-size: 0.8rem;
+  width: 10rem;
+  z-index: 1;
+}
+body .container .timer-container .footer .session-count-container p:hover span {
+  display: block;
+}
+body .container .timer-container .footer .button-control-container svg[data-testid=ReplayIcon] {
+  margin-left: 1.5rem;
+}
+body .container .timer-container .footer .button-control-container button {
+  background: none;
+  border: 2px solid #a7abae;
+  margin: 0 1.5rem;
+}
+body .container .timer-container .footer .button-control-container svg[data-testid=SkipNextIcon] {
+  margin-right: 1.3rem;
+}
+body .container .config-container {
+  width: 100%;
+  height: 34.7470625rem;
+}
+body .container .config-container .header {
+  width: 20rem;
+  margin: auto;
+}
+body .container .config-container .header h1 {
+  font-size: 1.6rem;
+}
+body .container .config-container .config-control-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 20rem;
+  margin: 2rem auto;
+}
+body .container .config-container .config-control-container .focus-time-container,
+body .container .config-container .config-control-container .short-break-container,
+body .container .config-container .config-control-container .long-break-container,
+body .container .config-container .config-control-container .session-rounds-container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+body .container .config-container .config-control-container .focus-time-container .text-field,
+body .container .config-container .config-control-container .short-break-container .text-field,
+body .container .config-container .config-control-container .long-break-container .text-field,
+body .container .config-container .config-control-container .session-rounds-container .text-field {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: center;
+}
+body .container .config-container .config-control-container .focus-time-container .text-field input,
+body .container .config-container .config-control-container .short-break-container .text-field input,
+body .container .config-container .config-control-container .long-break-container .text-field input,
+body .container .config-container .config-control-container .session-rounds-container .text-field input {
+  text-align: left;
+  color: #a7abae;
+  outline: none;
+  background: none;
+  border: 2px solid rgba(167, 171, 174, 0.05);
+  width: 15rem;
+  height: 2.1rem;
+  padding: 0 0.8rem;
+  font-size: 1rem;
+  transition: 100ms border-bottom linear;
+}
+body .container .config-container .config-control-container .focus-time-container .text-field input::-webkit-outer-spin-button, body .container .config-container .config-control-container .focus-time-container .text-field input::-webkit-inner-spin-button,
+body .container .config-container .config-control-container .short-break-container .text-field input::-webkit-outer-spin-button,
+body .container .config-container .config-control-container .short-break-container .text-field input::-webkit-inner-spin-button,
+body .container .config-container .config-control-container .long-break-container .text-field input::-webkit-outer-spin-button,
+body .container .config-container .config-control-container .long-break-container .text-field input::-webkit-inner-spin-button,
+body .container .config-container .config-control-container .session-rounds-container .text-field input::-webkit-outer-spin-button,
+body .container .config-container .config-control-container .session-rounds-container .text-field input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+}
+body .container .config-container .config-control-container .focus-time-container .text-field p,
+body .container .config-container .config-control-container .short-break-container .text-field p,
+body .container .config-container .config-control-container .long-break-container .text-field p,
+body .container .config-container .config-control-container .session-rounds-container .text-field p {
+  font-size: 1rem;
+  background-color: #1c2830;
+  border: 1px solid rgba(167, 171, 174, 0.05);
+  padding: 0.3rem 0.4rem;
+}
+body .container .config-container .config-control-container button {
+  margin-top: 1.5rem;
+  border: 1px solid rgba(167, 171, 174, 0.05);
+  color: #0098f7;
+}
+body .container .config-container .config-control-container button:hover {
+  background-color: rgba(28, 40, 48, 0.1);
+}/*# sourceMappingURL=main.css.map */
