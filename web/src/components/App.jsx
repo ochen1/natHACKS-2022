@@ -10,7 +10,8 @@ import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import ReplayIcon from '@mui/icons-material/Replay';
 import SkipNextIcon from '@mui/icons-material/SkipNext';
 import VolumeUpIcon from '@mui/icons-material/VolumeUp';
-import OpenInNewIcon from '@mui/icons-material/OpenInNew';
+import AvTimerIcon from '@mui/icons-material/AvTimer';
+import ScheduleIcon from '@mui/icons-material/Schedule';
 import Slider from '@mui/material/Slider';
 
 function App() {
@@ -32,6 +33,7 @@ function App() {
     const [isStart, setIsStart] = useState(false);
     const [timerPercentage, setTimerPercentage] = useState(100);
     const [sessionCount, setSessionCount] = useState(-1);
+    const [isNavTimerButtonHighlighted, setIsNavTimerButtonHighlighted] = useState(true);
     const [timeLeft, setTimeLeft] = React.useState(0);
     const timer = React.useRef({});
 
@@ -178,13 +180,18 @@ function App() {
     const generateSliderMarks = [];
 
     for (let i = 1; i < 40; i++) {
-        // generateSliderMarks
+        generateSliderMarks.push({ value: i });
     }
 
     const sliderMarks = [
-        {},
-        {}
+        { value: 0, label: "0 min." },
+        ...generateSliderMarks,
+        { value: 40, label: "40 min." }
     ];
+
+    function handleNavItemClick() {
+        setIsNavTimerButtonHighlighted((prev) => !prev);
+    }
 
     function handleTaskDelete(index) {
         setTasks((prev) => {
@@ -235,7 +242,31 @@ function App() {
     return (
         <div className="container">
             <nav>
+                {isNavTimerButtonHighlighted
+                    ?
+                    <div className="item" onClick={handleNavItemClick}>
+                        <ScheduleIcon fontSize="large" />
+                        <p className="item-description">Config</p>
+                    </div>
+                    :
+                    <div className="item clicked">
+                        <ScheduleIcon fontSize="large" />
+                        <p className="item-description">Config</p>
+                    </div>
+                }
 
+                {isNavTimerButtonHighlighted
+                    ?
+                    <div className="item clicked">
+                        <AvTimerIcon fontSize="large" />
+                        <p className="item-description">Timer</p>
+                    </div>
+                    :
+                    <div className="item" onClick={handleNavItemClick}>
+                        <AvTimerIcon fontSize="large" />
+                        <p className="item-description">Timer</p>
+                    </div>
+                }
             </nav>
 
             <div className="progress-container">
@@ -290,7 +321,6 @@ function App() {
 
                     <SkipNextIcon fontSize="large" />
                     <VolumeUpIcon fontSize="large" />
-                    <OpenInNewIcon fontSize="large" />
                 </div>
             </div>
         </div>

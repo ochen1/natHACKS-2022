@@ -52,18 +52,37 @@ body {
         width: 30rem;
 
         nav {
-            // position: fixed;
-            // top: 0;
-            // left: 0;
-            // right: 0;
-            // z-index: 3;
-            // padding: 1.5rem 2rem;
-            // display: flex;
-            // flex-direction: row;
-            // justify-content: space-between;
-            // align-items: center;
-            // background-color: $secondary-bg;
-            // border-bottom: 1px solid $box-border;
+            margin: 0 auto 2.5rem;
+            width: 25rem;
+            border-bottom: 2px solid $box-border;
+            display: flex;
+            flex-direction: row;
+            justify-content: space-around;
+            align-items: center;
+
+            .item {
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                padding-bottom: 0.5rem;
+                transform: translateY(2px);
+                cursor: pointer;
+
+                &.clicked {
+                    padding-bottom: calc(0.5rem - 2px);
+                    border-bottom: 2px solid $primary;
+                }
+
+                svg {
+                    font-size: 2rem;
+                    margin-bottom: 0.3rem;
+                }
+
+                p.item-description {
+                    font-size: 1rem;
+                }
+            }
         }
 
         .progress-container {
@@ -188,7 +207,7 @@ body {
 
             .button-control-container {
                 svg[data-testid=ReplayIcon] {
-                    margin-left: 1.3rem;
+                    margin-left: 1.5rem;
                 }
 
                 button {
@@ -198,15 +217,7 @@ body {
                 }
 
                 svg[data-testid=SkipNextIcon] {
-                    margin-right: 1rem;
-                }
-
-                svg[data-testid=VolumeUpIcon] {
-                    margin-right: 1rem;
-                }
-
-                svg[data-testid=OpenInNewIcon] {
-                    transform: rotate(180deg);
+                    margin-right: 1.3rem;
                 }
             }
         }

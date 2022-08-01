@@ -45,6 +45,35 @@ body .container {
   margin: auto;
   width: 30rem;
 }
+body .container nav {
+  margin: 0 auto 2.5rem;
+  width: 25rem;
+  border-bottom: 2px solid rgba(167, 171, 174, 0.05);
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  align-items: center;
+}
+body .container nav .item {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding-bottom: 0.5rem;
+  transform: translateY(2px);
+  cursor: pointer;
+}
+body .container nav .item.clicked {
+  padding-bottom: calc(0.5rem - 2px);
+  border-bottom: 2px solid #0098f7;
+}
+body .container nav .item svg {
+  font-size: 2rem;
+  margin-bottom: 0.3rem;
+}
+body .container nav .item p.item-description {
+  font-size: 1rem;
+}
 body .container .progress-container {
   display: flex;
   flex-direction: row;
@@ -144,7 +173,7 @@ body .container .footer .session-count-container p:hover span {
   display: block;
 }
 body .container .footer .button-control-container svg[data-testid=ReplayIcon] {
-  margin-left: 1.3rem;
+  margin-left: 1.5rem;
 }
 body .container .footer .button-control-container button {
   background: none;
@@ -152,11 +181,5 @@ body .container .footer .button-control-container button {
   margin: 0 1.5rem;
 }
 body .container .footer .button-control-container svg[data-testid=SkipNextIcon] {
-  margin-right: 1rem;
-}
-body .container .footer .button-control-container svg[data-testid=VolumeUpIcon] {
-  margin-right: 1rem;
-}
-body .container .footer .button-control-container svg[data-testid=OpenInNewIcon] {
-  transform: rotate(180deg);
+  margin-right: 1.3rem;
 }/*# sourceMappingURL=main.css.map */
