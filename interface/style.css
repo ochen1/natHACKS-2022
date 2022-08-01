@@ -115,4 +115,10 @@ iframe, canvas {
 button.collapse-btn {
     height: 100%;
     width: 3rem;
+    background-color: rgba(0, 0, 0, 0.4);
+    color: #fafafa;
+    border: 0.1rem solid rgba(255, 255, 255, 0.8);
+    box-shadow: 0px 0px 5px 2px #47e6f2, inset 0px 0px 5px 2px #47e6f2;
+    border-radius: 50px;
+    margin: 12px;
 }

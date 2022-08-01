@@ -17,6 +17,13 @@ var chart = new Chart("chart", {
                 fill: false,
                 backgroundColor: "transparent",
             },
+            {
+                label: "Long-Term Average",
+                data: [0],
+                borderColor: "rgba(0, 255, 65, 0.4)",
+                fill: false,
+                backgroundColor: "transparent",
+            },
         ],
     },
     options: {
@@ -63,12 +70,15 @@ socket.addEventListener('open', () => {
 
 socket.addEventListener('message', (event) => {
     chart.data.labels.push(chart.data.labels[chart.data.labels.length - 1] + 1);
-    chart.data.datasets[0].data.push(JSON.parse(event.data)[0]);
-    chart.data.datasets[1].data.push(JSON.parse(event.data)[1]);
+    let data = JSON.parse(event.data);
+    data.forEach((value, index) => {
+        chart.data.datasets[index].data.push(value);
+    });
     if (chart.data.labels.length > 40) {
+        data.forEach((value, index) => {
+            chart.data.datasets[index].data.shift();
+        });
         chart.data.labels.shift();
-        chart.data.datasets[0].data.shift();
-        chart.data.datasets[1].data.shift();
     }
     chart.update();
 });

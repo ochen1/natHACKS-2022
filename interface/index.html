@@ -40,7 +40,7 @@
                 <iframe class="curtain" src="console.html" class="iframe"></iframe>
             </div>
         </div>
-        <button class="collapse-btn" onclick="this.parentElement.querySelector('.right').classList.toggle('invis');">&lt;</button>
+        <button class="collapse-btn" onclick="this.parentElement.querySelector('.right').classList.toggle('invis');setTimeout(()=>{this.innerText=this.innerText=='&lt;'?'&gt;':'&lt;'}, 200);">&lt;</button>
     </div>
     <script>
         document.querySelectorAll(".btn-hide").forEach(btn => {
