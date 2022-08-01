@@ -12,8 +12,24 @@ h1 {
   font-size: 3rem;
 }
 
+h2 {
+  font-weight: 400;
+  font-size: 1.4rem;
+}
+
 p {
   font-size: 1.3rem;
+}
+
+a {
+  text-decoration: none;
+  font-size: 1.3rem;
+}
+
+hr {
+  border: none;
+  border-top: 1px solid rgba(167, 171, 174, 0.05);
+  width: 100%;
 }
 
 body {
@@ -50,7 +66,7 @@ body .container .list {
   border: 1px solid rgba(167, 171, 174, 0.05);
   padding: 0.6rem 0.4rem 1.1rem;
   width: 18rem;
-  margin: 1.5rem auto;
+  margin: 2.5rem auto;
 }
 body .container .list .task-container {
   width: 100%;
@@ -70,8 +86,6 @@ body .container .list .task-container div svg {
   cursor: pointer;
 }
 body .container .list hr {
-  border: none;
-  border-top: 1px solid rgba(167, 171, 174, 0.05);
   margin: 1rem auto 0.7rem;
 }
 body .container .list .input-container input {
@@ -106,18 +120,15 @@ body .container .footer {
   justify-content: center;
   align-items: center;
 }
-body .container .footer .session-count-container,
-body .container .footer .grace-time-container {
+body .container .footer .session-count-container {
   position: relative;
 }
-body .container .footer .session-count-container p,
-body .container .footer .grace-time-container p {
+body .container .footer .session-count-container p {
   font-size: 1.8rem;
   font-weight: 500;
   margin-bottom: 1.7rem;
 }
-body .container .footer .session-count-container p span,
-body .container .footer .grace-time-container p span {
+body .container .footer .session-count-container p span {
   display: none;
   position: absolute;
   left: -11rem;
@@ -129,17 +140,7 @@ body .container .footer .grace-time-container p span {
   width: 10rem;
   z-index: 1;
 }
-body .container .footer .session-count-container p:hover span,
-body .container .footer .grace-time-container p:hover span {
-  display: block;
-}
-body .container .footer .grace-time-container p {
-  margin-left: 1.5rem;
-}
-body .container .footer .grace-time-container p span {
-  left: -9rem;
-}
-body .container .footer .grace-time-container p:hover span {
+body .container .footer .session-count-container p:hover span {
   display: block;
 }
 body .container .footer .button-control-container svg[data-testid=ReplayIcon] {

@@ -18,8 +18,24 @@ h1 {
     font-size: 3rem;
 }
 
+h2 {
+    font-weight: 400;
+    font-size: 1.4rem;
+}
+
 p {
     font-size: 1.3rem;
+}
+
+a {
+    text-decoration: none;
+    font-size: 1.3rem;
+}
+
+hr {
+    border: none;
+    border-top: 1px solid $box-border;
+    width: 100%;
 }
 
 body {
@@ -34,6 +50,21 @@ body {
     .container {
         margin: auto;
         width: 30rem;
+
+        nav {
+            // position: fixed;
+            // top: 0;
+            // left: 0;
+            // right: 0;
+            // z-index: 3;
+            // padding: 1.5rem 2rem;
+            // display: flex;
+            // flex-direction: row;
+            // justify-content: space-between;
+            // align-items: center;
+            // background-color: $secondary-bg;
+            // border-bottom: 1px solid $box-border;
+        }
 
         .progress-container {
             display: flex;
@@ -62,7 +93,7 @@ body {
             border: 1px solid $box-border;
             padding: 0.6rem 0.4rem 1.1rem;
             width: 18rem;
-            margin: 1.5rem auto;
+            margin: 2.5rem auto;
 
             .task-container {
                 width: 100%;
@@ -86,8 +117,6 @@ body {
             }
 
             hr {
-                border: none;
-                border-top: 1px solid $box-border;
                 margin: 1rem auto 0.7rem;
             }
 
@@ -128,8 +157,7 @@ body {
             justify-content: center;
             align-items: center;
 
-            .session-count-container,
-            .grace-time-container {
+            .session-count-container {
                 position: relative;
 
                 p {
@@ -148,22 +176,6 @@ body {
                         font-size: 0.8rem;
                         width: 10rem;
                         z-index: 1;
-                    }
-
-                    &:hover {
-                        span {
-                            display: block;
-                        }
-                    }
-                }
-            }
-
-            .grace-time-container {
-                p {
-                    margin-left: 1.5rem;
-
-                    span {
-                        left: -9rem;
                     }
 
                     &:hover {

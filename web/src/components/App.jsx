@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import TimeFormat from "hh-mm-ss";
+import axios from "axios";
 import { buildStyles, CircularProgressbarWithChildren } from "react-circular-progressbar";
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import PauseIcon from '@mui/icons-material/Pause';
@@ -10,24 +11,27 @@ import ReplayIcon from '@mui/icons-material/Replay';
 import SkipNextIcon from '@mui/icons-material/SkipNext';
 import VolumeUpIcon from '@mui/icons-material/VolumeUp';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
+import Slider from '@mui/material/Slider';
 
 function App() {
-    // const defaultFocusTime = 60 * 25;
-    const defaultFocusTime = 5 * 1000;
-    // const defaultBreakTime = 60 * 5 * 1000;
+    // const defaultFocusTime = 60 * 25 * 1000;
+    const defaultNormalFocusTime = 5 * 1000;
+    // const defaultShortBreakTime = 60 * 5 * 1000;
     const defaultShortBreakTime = 3 * 1000;
     // const defaultLongBreakTime = 60 * 20 * 1000;
     const defaultLongBreakTime = 4 * 1000;
+    // const defaultGraceTime = 15 * 60 * 1000;
+    const defaultNormalGraceTime = 8 * 1000;
 
+    const [defaultFocusTime, setDefaultNormalFocusTime] = useState(defaultNormalFocusTime);
     const [defaultBreakTime, setDefaultBreakTime] = useState(defaultShortBreakTime);
-    const [graceTime, setGraceTime] = useState({
-        // count: 0,
-        // time: 0, (make this count * 60 * 5 * 1000 dynamically)
-        // count: 3,
-        // time: 3 * 60 * 5 * 1000
-        count: 1,
-        time: 10 * 1000
-    });
+    const [defaultGraceTime, setDefaultGraceTime] = useState(defaultNormalGraceTime);
+
+
+    const [graceTimeGetRequest, setGraceTimeGetRequest] = useState(false);
+    const [graceTimeGetRequestInterval, setGraceTimeGetRequestInterval] = useState();
+
+
     const [status, setStatus] = useState("Stay Focused");
     const [tasks, setTasks] = useState(["Add a Task"]);
     const [inputTask, setInputTask] = useState("");
@@ -111,25 +115,18 @@ function App() {
             if (status === "Stay Focused") {
                 setTimerPercentage(timer.current.timeLeft / defaultFocusTime * 100);
             } else if (status === "Grace Time") {
-                setTimerPercentage(timer.current.timeLeft / graceTime.time * 100);
+                setTimerPercentage(timer.current.timeLeft / defaultGraceTime * 100);
             } else {
                 setTimerPercentage(timer.current.timeLeft / defaultBreakTime * 100);
             }
 
             if (timer.current.timeLeft === undefined) {
                 if (status === "Stay Focused") {
-                    if (graceTime.count > 0) {
-                        setStatus("Grace Time");
-                        restart(graceTime.time);
-                    } else {
-                        setStatus("Break");
-                        restart(defaultBreakTime);
-                    }
+                    setGraceTimeGetRequest(true);
+                    setStatus("Grace Time");
+                    restart(defaultGraceTime);
                 } else if (status === "Grace Time") {
-                    setGraceTime({
-                        count: 0,
-                        time: 0
-                    });
+                    setGraceTimeGetRequest(false);
                     setStatus("Break");
                     restart(defaultBreakTime);
                 } else {
@@ -141,18 +138,40 @@ function App() {
     }, [timer.current.timeLeft]);
 
     useEffect(() => {
-        if (status === "Stay Focused") {
-            if (sessionCount === 3) {
-                setDefaultBreakTime(defaultLongBreakTime);
+        if (graceTimeGetRequest) {
+            setGraceTimeGetRequestInterval(setInterval(() => {
+                console.log("still here");
+                axios.get("http://localhost:8080/api/v1/muse/eeg/is_attentive")
+                    .then((res) => {
+                        console.log(res, res.data.is_attentive);
 
-                setSessionCount(0);
-            } else {
-                setDefaultBreakTime(defaultBreakTime);
-
-                setSessionCount((prev) => prev + 1);
-            }
+                        if (res.data.is_attentive === false) {
+                            setStatus("Break");
+                            restart(defaultBreakTime);
+                        }
+                    })
+                    .catch((err) => {
+                        console.error(err);
+                    });
+            }, 1000));
+        } else {
+            clearInterval(graceTimeGetRequestInterval);
         }
-    }, [status]);
+    }, [graceTimeGetRequest]);
+
+    // useEffect(() => {
+    //     if (status === "Stay Focused") {
+    //         if (sessionCount === 3) {
+    //             setDefaultBreakTime(defaultLongBreakTime);
+
+    //             setSessionCount(0);
+    //         } else {
+    //             setDefaultBreakTime(defaultBreakTime);
+
+    //             setSessionCount((prev) => prev + 1);
+    //         }
+    //     }
+    // }, [status]);
 
     const progressBarStyle = {
         pathTransitionDuration: 0.5,
@@ -168,6 +187,17 @@ function App() {
     const resetIconStyle = {
         cursor: "pointer"
     };
+
+    const generateSliderMarks = [];
+
+    for (let i = 1; i < 40; i++) {
+        // generateSliderMarks
+    }
+
+    const sliderMarks = [
+        {},
+        {}
+    ];
 
     function handleTaskDelete(index) {
         setTasks((prev) => {
@@ -217,6 +247,10 @@ function App() {
 
     return (
         <div className="container">
+            <nav>
+
+            </nav>
+
             <div className="progress-container">
                 <CircularProgressbarWithChildren value={timerPercentage} className="progress" strokeWidth={3} styles={buildStyles(progressBarStyle)}>
                     <div className="progress-text" style={progressBarTextStyle}>
@@ -252,10 +286,6 @@ function App() {
             <div className="footer">
                 <div className="session-count-container">
                     <p>{sessionCount}/4<span>Number of sessions completed</span></p>
-                </div>
-
-                <div className="grace-time-container">
-                    <p>{graceTime.count}<span>Number of grace time sessions added</span></p>
                 </div>
 
                 <div className="button-control-container">
