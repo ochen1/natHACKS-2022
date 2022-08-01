@@ -26,12 +26,6 @@ function App() {
     const [defaultFocusTime, setDefaultNormalFocusTime] = useState(defaultNormalFocusTime);
     const [defaultBreakTime, setDefaultBreakTime] = useState(defaultShortBreakTime);
     const [defaultGraceTime, setDefaultGraceTime] = useState(defaultNormalGraceTime);
-
-
-    const [graceTimeGetRequest, setGraceTimeGetRequest] = useState(false);
-    const [graceTimeGetRequestInterval, setGraceTimeGetRequestInterval] = useState();
-
-
     const [status, setStatus] = useState("Stay Focused");
     const [tasks, setTasks] = useState(["Add a Task"]);
     const [inputTask, setInputTask] = useState("");
@@ -122,11 +116,9 @@ function App() {
 
             if (timer.current.timeLeft === undefined) {
                 if (status === "Stay Focused") {
-                    setGraceTimeGetRequest(true);
                     setStatus("Grace Time");
                     restart(defaultGraceTime);
                 } else if (status === "Grace Time") {
-                    setGraceTimeGetRequest(false);
                     setStatus("Break");
                     restart(defaultBreakTime);
                 } else {
@@ -138,26 +130,21 @@ function App() {
     }, [timer.current.timeLeft]);
 
     useEffect(() => {
-        if (graceTimeGetRequest) {
-            setGraceTimeGetRequestInterval(setInterval(() => {
-                console.log("still here");
-                axios.get("http://localhost:8080/api/v1/muse/eeg/is_attentive")
-                    .then((res) => {
-                        console.log(res, res.data.is_attentive);
-
-                        if (res.data.is_attentive === false) {
+        setTimeout(() => {
+            axios.get("http://localhost:8080/api/v1/muse/eeg/is_attentive")
+                .then((res) => {
+                    if (res.data.is_attentive === false) {
+                        if (status === "Grace Time") {
                             setStatus("Break");
                             restart(defaultBreakTime);
                         }
-                    })
-                    .catch((err) => {
-                        console.error(err);
-                    });
-            }, 1000));
-        } else {
-            clearInterval(graceTimeGetRequestInterval);
-        }
-    }, [graceTimeGetRequest]);
+                    }
+                })
+                .catch((err) => {
+                    console.error(err);
+                });
+        }, 1000);
+    }, [timer.current.timeLeft, status]);
 
     // useEffect(() => {
     //     if (status === "Stay Focused") {
