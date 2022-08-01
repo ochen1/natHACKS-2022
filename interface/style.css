@@ -160,7 +160,7 @@ button {
 }
 .speedbox__score {
     position: absolute;
-    left: 0;
+    right: -50px;
     top: 0;
     transform: rotate(-45deg);
     -webkit-transform: rotate(-0deg);
@@ -168,9 +168,9 @@ button {
     width: 100px;
     background: transparent;
     border-radius: 50%;
-    border: 14px solid #00ff41;
+    border: 10px solid #00ff41;
     border-color: transparent transparent #00ff41 #00ff41;
-    box-shadow: 0px 0px 7px 2px #00ff41, inset 0px 0px 7px 2px #00ff41;
+    box-shadow: 0px 0px 5px 2px #00ff41, inset 0px 0px 5px 2px #00ff41;
     box-sizing: border-box;
     cursor: pointer;
     z-index: 1;
@@ -182,10 +182,10 @@ button {
     background: transparent;
     border-top-left-radius: 100px;
     border-top-right-radius: 100px;
-    border: 14px solid #eee;
+    border: 10px solid #eee;
     border-bottom: 0;
     box-sizing: border-box;
     position: absolute;
-    left: 0;
+    right: -50px;
     top: 0;
 }
