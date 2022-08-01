@@ -5,8 +5,8 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Web UI - natHACKS</title>
-    <link rel="stylesheet" href="style.css">
     <link href="/res/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
     <script src="/res/Chart.js"></script>
     <script defer src="script.js"></script>
 </head>
@@ -37,7 +37,9 @@
                 <button class="btn-hide">X</button>
             </div>
             <div class="widget">
-                <iframe class="curtain" src="console.html" class="iframe"></iframe>
+                <!-- <iframe class="curtain" src="console.html" class="iframe"></iframe> -->
+                <img class="instagram-logo" src="./instagram.svg">
+                <img class="activity-watch-logo" src="./activitywatch.svg">
             </div>
         </div>
         <button class="collapse-btn" onclick="this.parentElement.querySelector('.right').classList.toggle('invis');setTimeout(()=>{this.innerText=this.innerText=='&lt;'?'&gt;':'&lt;'}, 200);">&lt;</button>
