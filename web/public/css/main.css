@@ -12,11 +12,6 @@ h1 {
   font-size: 3rem;
 }
 
-h2 {
-  font-weight: 400;
-  font-size: 1.4rem;
-}
-
 p {
   font-size: 1.3rem;
 }
@@ -74,50 +69,50 @@ body .container nav .item svg {
 body .container nav .item p.item-description {
   font-size: 1rem;
 }
-body .container .progress-container {
+body .container .timer-container .progress-container {
   display: flex;
   flex-direction: row;
   justify-content: center;
   align-items: center;
 }
-body .container .progress-container .progress {
+body .container .timer-container .progress-container .progress {
   margin: auto;
   width: 18rem;
 }
-body .container .progress-container .progress-text h1 {
+body .container .timer-container .progress-container .progress-text h1 {
   color: #0098f7;
 }
-body .container .progress-container .progress-text .status p {
+body .container .timer-container .progress-container .progress-text .status p {
   color: #a7abae;
 }
-body .container .list {
+body .container .timer-container .list {
   background-color: #1c2830;
   border: 1px solid rgba(167, 171, 174, 0.05);
   padding: 0.6rem 0.4rem 1.1rem;
   width: 18rem;
   margin: 2.5rem auto;
 }
-body .container .list .task-container {
+body .container .timer-container .list .task-container {
   width: 100%;
 }
-body .container .list .task-container div {
+body .container .timer-container .list .task-container div {
   margin: 0.5rem 1rem;
   display: flex;
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
 }
-body .container .list .task-container div p {
+body .container .timer-container .list .task-container div p {
   font-size: 1rem;
 }
-body .container .list .task-container div svg {
+body .container .timer-container .list .task-container div svg {
   font-size: 1.4rem;
   cursor: pointer;
 }
-body .container .list hr {
+body .container .timer-container .list hr {
   margin: 1rem auto 0.7rem;
 }
-body .container .list .input-container input {
+body .container .timer-container .list .input-container input {
   background: none;
   outline: none;
   border: none;
@@ -127,17 +122,17 @@ body .container .list .input-container input {
   width: 10rem;
   margin-right: 0.5rem;
 }
-body .container .list .input-container input:focus {
+body .container .timer-container .list .input-container input:focus {
   border-bottom: 2px solid #a7abae;
 }
-body .container .list .input-container button {
+body .container .timer-container .list .input-container button {
   outline: none;
   background: none;
   border: none;
   font-size: 1.3rem;
   cursor: pointer;
 }
-body .container .footer {
+body .container .timer-container .footer {
   position: -webkit-sticky;
   position: sticky;
   bottom: 0;
@@ -149,15 +144,15 @@ body .container .footer {
   justify-content: center;
   align-items: center;
 }
-body .container .footer .session-count-container {
+body .container .timer-container .footer .session-count-container {
   position: relative;
 }
-body .container .footer .session-count-container p {
+body .container .timer-container .footer .session-count-container p {
   font-size: 1.8rem;
   font-weight: 500;
   margin-bottom: 1.7rem;
 }
-body .container .footer .session-count-container p span {
+body .container .timer-container .footer .session-count-container p span {
   display: none;
   position: absolute;
   left: -11rem;
@@ -169,17 +164,96 @@ body .container .footer .session-count-container p span {
   width: 10rem;
   z-index: 1;
 }
-body .container .footer .session-count-container p:hover span {
+body .container .timer-container .footer .session-count-container p:hover span {
   display: block;
 }
-body .container .footer .button-control-container svg[data-testid=ReplayIcon] {
+body .container .timer-container .footer .button-control-container svg[data-testid=ReplayIcon] {
   margin-left: 1.5rem;
 }
-body .container .footer .button-control-container button {
+body .container .timer-container .footer .button-control-container button {
   background: none;
   border: 2px solid #a7abae;
   margin: 0 1.5rem;
 }
-body .container .footer .button-control-container svg[data-testid=SkipNextIcon] {
+body .container .timer-container .footer .button-control-container svg[data-testid=SkipNextIcon] {
   margin-right: 1.3rem;
+}
+body .container .config-container {
+  width: 100%;
+  height: 34.7470625rem;
+}
+body .container .config-container .header {
+  width: 20rem;
+  margin: auto;
+}
+body .container .config-container .header h1 {
+  font-size: 1.6rem;
+}
+body .container .config-container .config-control-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 20rem;
+  margin: 2rem auto;
+}
+body .container .config-container .config-control-container .focus-time-container,
+body .container .config-container .config-control-container .short-break-container,
+body .container .config-container .config-control-container .long-break-container,
+body .container .config-container .config-control-container .session-rounds-container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+body .container .config-container .config-control-container .focus-time-container .text-field,
+body .container .config-container .config-control-container .short-break-container .text-field,
+body .container .config-container .config-control-container .long-break-container .text-field,
+body .container .config-container .config-control-container .session-rounds-container .text-field {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: center;
+}
+body .container .config-container .config-control-container .focus-time-container .text-field input,
+body .container .config-container .config-control-container .short-break-container .text-field input,
+body .container .config-container .config-control-container .long-break-container .text-field input,
+body .container .config-container .config-control-container .session-rounds-container .text-field input {
+  text-align: left;
+  color: #a7abae;
+  outline: none;
+  background: none;
+  border: 2px solid rgba(167, 171, 174, 0.05);
+  width: 15rem;
+  height: 2.1rem;
+  padding: 0 0.8rem;
+  font-size: 1rem;
+  transition: 100ms border-bottom linear;
+}
+body .container .config-container .config-control-container .focus-time-container .text-field input::-webkit-outer-spin-button, body .container .config-container .config-control-container .focus-time-container .text-field input::-webkit-inner-spin-button,
+body .container .config-container .config-control-container .short-break-container .text-field input::-webkit-outer-spin-button,
+body .container .config-container .config-control-container .short-break-container .text-field input::-webkit-inner-spin-button,
+body .container .config-container .config-control-container .long-break-container .text-field input::-webkit-outer-spin-button,
+body .container .config-container .config-control-container .long-break-container .text-field input::-webkit-inner-spin-button,
+body .container .config-container .config-control-container .session-rounds-container .text-field input::-webkit-outer-spin-button,
+body .container .config-container .config-control-container .session-rounds-container .text-field input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+}
+body .container .config-container .config-control-container .focus-time-container .text-field p,
+body .container .config-container .config-control-container .short-break-container .text-field p,
+body .container .config-container .config-control-container .long-break-container .text-field p,
+body .container .config-container .config-control-container .session-rounds-container .text-field p {
+  font-size: 1rem;
+  background-color: #1c2830;
+  border: 1px solid rgba(167, 171, 174, 0.05);
+  padding: 0.3rem 0.4rem;
+}
+body .container .config-container .config-control-container button {
+  margin-top: 1.5rem;
+  border: 1px solid rgba(167, 171, 174, 0.05);
+  color: #0098f7;
+}
+body .container .config-container .config-control-container button:hover {
+  background-color: rgba(28, 40, 48, 0.1);
 }/*# sourceMappingURL=main.css.map */

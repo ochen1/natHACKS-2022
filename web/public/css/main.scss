@@ -18,11 +18,6 @@ h1 {
     font-size: 3rem;
 }
 
-h2 {
-    font-weight: 400;
-    font-size: 1.4rem;
-}
-
 p {
     font-size: 1.3rem;
 }
@@ -85,141 +80,224 @@ body {
             }
         }
 
-        .progress-container {
-            display: flex;
-            flex-direction: row;
-            justify-content: center;
-            align-items: center;
+        .timer-container {
+            .progress-container {
+                display: flex;
+                flex-direction: row;
+                justify-content: center;
+                align-items: center;
 
-            .progress {
-                margin: auto;
-                width: 18rem;
-            }
-
-            .progress-text {
-                h1 {
-                    color: $primary;
+                .progress {
+                    margin: auto;
+                    width: 18rem;
                 }
 
-                .status p {
-                    color: $color-grey;
-                }
-            }
-        }
-
-        .list {
-            background-color: $secondary-bg;
-            border: 1px solid $box-border;
-            padding: 0.6rem 0.4rem 1.1rem;
-            width: 18rem;
-            margin: 2.5rem auto;
-
-            .task-container {
-                width: 100%;
-
-                div {
-                    margin: 0.5rem 1rem;
-                    display: flex;
-                    flex-direction: row;
-                    justify-content: space-between;
-                    align-items: center;
-
-                    p {
-                        font-size: 1rem;
+                .progress-text {
+                    h1 {
+                        color: $primary;
                     }
 
-                    svg {
-                        font-size: 1.4rem;
+                    .status p {
+                        color: $color-grey;
+                    }
+                }
+            }
+
+            .list {
+                background-color: $secondary-bg;
+                border: 1px solid $box-border;
+                padding: 0.6rem 0.4rem 1.1rem;
+                width: 18rem;
+                margin: 2.5rem auto;
+
+                .task-container {
+                    width: 100%;
+
+                    div {
+                        margin: 0.5rem 1rem;
+                        display: flex;
+                        flex-direction: row;
+                        justify-content: space-between;
+                        align-items: center;
+
+                        p {
+                            font-size: 1rem;
+                        }
+
+                        svg {
+                            font-size: 1.4rem;
+                            cursor: pointer;
+                        }
+                    }
+                }
+
+                hr {
+                    margin: 1rem auto 0.7rem;
+                }
+
+                .input-container {
+                    input {
+                        background: none;
+                        outline: none;
+                        border: none;
+                        border-bottom: 2px solid rgba($color-grey, 0.5);
+                        transition: 50ms border-bottom linear;
+                        font-size: 1rem;
+                        width: 10rem;
+                        margin-right: 0.5rem;
+
+                        &:focus {
+                            border-bottom: 2px solid $color-grey;
+                        }
+                    }
+
+                    button {
+                        outline: none;
+                        background: none;
+                        border: none;
+                        font-size: 1.3rem;
                         cursor: pointer;
                     }
                 }
             }
 
-            hr {
-                margin: 1rem auto 0.7rem;
-            }
+            .footer {
+                position: sticky;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                width: 100%;
+                display: flex;
+                flex-direction: row;
+                justify-content: center;
+                align-items: center;
 
-            .input-container {
-                input {
-                    background: none;
-                    outline: none;
-                    border: none;
-                    border-bottom: 2px solid rgba($color-grey, 0.5);
-                    transition: 50ms border-bottom linear;
-                    font-size: 1rem;
-                    width: 10rem;
-                    margin-right: 0.5rem;
+                .session-count-container {
+                    position: relative;
 
-                    &:focus {
-                        border-bottom: 2px solid $color-grey;
+                    p {
+                        font-size: 1.8rem;
+                        font-weight: 500;
+                        margin-bottom: 1.7rem;
+
+                        span {
+                            display: none;
+                            position: absolute;
+                            left: -11rem;
+                            top: -0.2rem;
+                            padding: 0.4rem 0.2rem;
+                            background-color: $secondary-bg;
+                            border: rgba($color-grey, 0.05);
+                            font-size: 0.8rem;
+                            width: 10rem;
+                            z-index: 1;
+                        }
+
+                        &:hover {
+                            span {
+                                display: block;
+                            }
+                        }
                     }
                 }
 
-                button {
-                    outline: none;
-                    background: none;
-                    border: none;
-                    font-size: 1.3rem;
-                    cursor: pointer;
+                .button-control-container {
+                    svg[data-testid=ReplayIcon] {
+                        margin-left: 1.5rem;
+                    }
+
+                    button {
+                        background: none;
+                        border: 2px solid $color-grey;
+                        margin: 0 1.5rem;
+                    }
+
+                    svg[data-testid=SkipNextIcon] {
+                        margin-right: 1.3rem;
+                    }
                 }
             }
         }
 
-        .footer {
-            position: sticky;
-            bottom: 0;
-            left: 0;
-            right: 0;
+        .config-container {
             width: 100%;
-            display: flex;
-            flex-direction: row;
-            justify-content: center;
-            align-items: center;
+            height: calc(555.953rem / 16);
 
-            .session-count-container {
-                position: relative;
+            .header {
+                // display: flex;
+                // flex-direction: row;
+                // justify-content: space-between;
+                // align-items: center;
+                width: 20rem;
+                margin: auto;
 
-                p {
-                    font-size: 1.8rem;
-                    font-weight: 500;
-                    margin-bottom: 1.7rem;
+                h1 {
+                    font-size: 1.6rem;
+                }
+            }
 
-                    span {
-                        display: none;
-                        position: absolute;
-                        left: -11rem;
-                        top: -0.2rem;
-                        padding: 0.4rem 0.2rem;
-                        background-color: $secondary-bg;
-                        border: rgba($color-grey, 0.05);
-                        font-size: 0.8rem;
-                        width: 10rem;
-                        z-index: 1;
-                    }
+            .config-control-container {
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                width: 20rem;
+                margin: 2rem auto;
 
-                    &:hover {
-                        span {
-                            display: block;
+                .focus-time-container,
+                .short-break-container,
+                .long-break-container,
+                .session-rounds-container {
+                    display: flex;
+                    flex-direction: column;
+                    align-items: flex-start;
+                    justify-content: center;
+                    margin-bottom: 1rem;
+
+                    .text-field {
+                        display: flex;
+                        flex-direction: row;
+                        align-items: flex-start;
+                        justify-content: center;
+
+                        input {
+                            text-align: left;
+                            color: $color-grey;
+                            outline: none;
+                            background: none;
+                            border: 2px solid $box-border;
+                            width: 15rem;
+                            height: 2.1rem;
+                            padding: 0 0.8rem;
+                            font-size: 1rem;
+                            transition: 100ms border-bottom linear;
+
+                            &::-webkit-outer-spin-button,
+                            &::-webkit-inner-spin-button {
+                                -webkit-appearance: none;
+                            }
+                        }
+
+                        p {
+                            font-size: 1rem;
+                            background-color: $secondary-bg;
+                            border: 1px solid $box-border;
+                            padding: 0.3rem 0.4rem;
                         }
                     }
                 }
-            }
-
-            .button-control-container {
-                svg[data-testid=ReplayIcon] {
-                    margin-left: 1.5rem;
-                }
 
                 button {
-                    background: none;
-                    border: 2px solid $color-grey;
-                    margin: 0 1.5rem;
-                }
+                    margin-top: 1.5rem;
+                    border: 1px solid $box-border;
+                    color: $primary;
 
-                svg[data-testid=SkipNextIcon] {
-                    margin-right: 1.3rem;
+                    &:hover {
+                        background-color: rgba($secondary-bg, 0.1);
+                    }
                 }
             }
+
         }
     }
 }

@@ -12,7 +12,8 @@ import SkipNextIcon from '@mui/icons-material/SkipNext';
 import VolumeUpIcon from '@mui/icons-material/VolumeUp';
 import AvTimerIcon from '@mui/icons-material/AvTimer';
 import ScheduleIcon from '@mui/icons-material/Schedule';
-import Slider from '@mui/material/Slider';
+import Button from '@mui/material/Button';
+import TextField from '@mui/material/TextField';
 
 function App() {
     // const defaultFocusTime = 60 * 25 * 1000;
@@ -33,7 +34,7 @@ function App() {
     const [isStart, setIsStart] = useState(false);
     const [timerPercentage, setTimerPercentage] = useState(100);
     const [sessionCount, setSessionCount] = useState(-1);
-    const [isNavTimerButtonHighlighted, setIsNavTimerButtonHighlighted] = useState(true);
+    const [isNavTimerButtonHighlighted, setIsNavTimerButtonHighlighted] = useState(false);
     const [timeLeft, setTimeLeft] = React.useState(0);
     const timer = React.useRef({});
 
@@ -177,18 +178,6 @@ function App() {
         cursor: "pointer"
     };
 
-    const generateSliderMarks = [];
-
-    for (let i = 1; i < 40; i++) {
-        generateSliderMarks.push({ value: i });
-    }
-
-    const sliderMarks = [
-        { value: 0, label: "0 min." },
-        ...generateSliderMarks,
-        { value: 40, label: "40 min." }
-    ];
-
     function handleNavItemClick() {
         setIsNavTimerButtonHighlighted((prev) => !prev);
     }
@@ -329,6 +318,42 @@ function App() {
                 </div>
                 :
                 <div className="config-container">
+                    <div className="header">
+                        <h1>Rules</h1>
+                    </div>
+
+                    {/* <form className="config-control-container" onSubmit={}> */}
+                    <form className="config-control-container">
+                        <div className="focus-time-container">
+                            <div className="text-field">
+                                <input type="number" max={45} min={1} placeholder="Focus Time" />
+                                <p className="unit">min</p>
+                            </div>
+                        </div>
+
+                        <div className="short-break-container">
+                            <div className="text-field">
+                                <input type="number" max={10} min={1} placeholder="Short Break Time" />
+                                <p className="unit">min</p>
+                            </div>
+                        </div>
+
+                        <div className="long-break-container">
+                            <div className="text-field">
+                                <input type="number" max={20} min={5} placeholder="Long Break Time" />
+                                <p className="unit">min</p>
+                            </div>
+                        </div>
+
+                        <div className="session-rounds-container">
+                            <div className="text-field">
+                                <input type="number" max={10} min={1} placeholder="Session Rounds" />
+                                <p className="unit">min</p>
+                            </div>
+                        </div>
+
+                        <Button variant="outlined" type="submit">Enter</Button>
+                    </form>
 
                 </div>
             }
