@@ -269,62 +269,71 @@ function App() {
                 }
             </nav>
 
-            <div className="progress-container">
-                <CircularProgressbarWithChildren value={timerPercentage} className="progress" strokeWidth={3} styles={buildStyles(progressBarStyle)}>
-                    <div className="progress-text" style={progressBarTextStyle}>
-                        <h1>{TimeFormat.fromS(timeLeft / 1000, "mm:ss")}</h1>
+            {isNavTimerButtonHighlighted
+                ?
+                <div className="timer-container">
+                    <div className="progress-container">
+                        <CircularProgressbarWithChildren value={timerPercentage} className="progress" strokeWidth={3} styles={buildStyles(progressBarStyle)}>
+                            <div className="progress-text" style={progressBarTextStyle}>
+                                <h1>{TimeFormat.fromS(timeLeft / 1000, "mm:ss")}</h1>
 
-                        <div className="status">
-                            <p>{status}</p>
+                                <div className="status">
+                                    <p>{status}</p>
+                                </div>
+                            </div>
+                        </CircularProgressbarWithChildren>
+                    </div>
+
+                    <div className="list">
+                        <div className="task-container">
+                            {tasks.map((task, index) => {
+                                return (
+                                    <div key={index}>
+                                        <p>{task}</p>
+                                        <DeleteForeverIcon onClick={() => handleTaskDelete(index)} />
+                                    </div>
+                                );
+                            })}
+                        </div>
+
+                        <hr />
+
+                        <form className="input-container" onSubmit={handleTaskSubmit}>
+                            <input type="text" placeholder="Task" required value={inputTask} onChange={handleTaskInputChange} />
+                            <button type="submit">+</button>
+                        </form>
+                    </div>
+
+                    <div className="footer">
+                        <div className="session-count-container">
+                            <p>{sessionCount}/4<span>Number of sessions completed</span></p>
+                        </div>
+
+                        <div className="button-control-container">
+                            {
+                                status === "Stay Focused"
+                                    ? <ReplayIcon fontSize="large" name="clickable" style={resetIconStyle} onClick={handleResetClick} />
+                                    : <ReplayIcon fontSize="large" name="unclickable" style={resetIconStyle} />
+                            }
+
+                            <Zoom in={true}>
+                                <Fab onClick={handleStartClick}>
+                                    {isStart ? <PlayArrowIcon fontSize="large" /> : <PauseIcon fontSize="large" />}
+                                </Fab>
+                            </Zoom>
+
+                            <SkipNextIcon fontSize="large" />
+                            <VolumeUpIcon fontSize="large" />
                         </div>
                     </div>
-                </CircularProgressbarWithChildren>
-            </div>
-
-            <div className="list">
-                <div className="task-container">
-                    {tasks.map((task, index) => {
-                        return (
-                            <div key={index}>
-                                <p>{task}</p>
-                                <DeleteForeverIcon onClick={() => handleTaskDelete(index)} />
-                            </div>
-                        );
-                    })}
                 </div>
+                :
+                <div className="config-container">
 
-                <hr />
-
-                <form className="input-container" onSubmit={handleTaskSubmit}>
-                    <input type="text" placeholder="Task" required value={inputTask} onChange={handleTaskInputChange} />
-                    <button type="submit">+</button>
-                </form>
-            </div>
-
-            <div className="footer">
-                <div className="session-count-container">
-                    <p>{sessionCount}/4<span>Number of sessions completed</span></p>
                 </div>
-
-                <div className="button-control-container">
-                    {
-                        status === "Stay Focused"
-                            ? <ReplayIcon fontSize="large" name="clickable" style={resetIconStyle} onClick={handleResetClick} />
-                            : <ReplayIcon fontSize="large" name="unclickable" style={resetIconStyle} />
-                    }
-
-                    <Zoom in={true}>
-                        <Fab onClick={handleStartClick}>
-                            {isStart ? <PlayArrowIcon fontSize="large" /> : <PauseIcon fontSize="large" />}
-                        </Fab>
-                    </Zoom>
-
-                    <SkipNextIcon fontSize="large" />
-                    <VolumeUpIcon fontSize="large" />
-                </div>
-            </div>
+            }
         </div>
     );
 }
 
-export default App;
+export default App;;
