@@ -73,9 +73,11 @@ socket.addEventListener('message', (event) => {
     let data = JSON.parse(event.data);
     data.forEach((value, index) => {
         chart.data.datasets[index].data.push(value);
-        chart.data.datasets[index].data.shift();
     });
     if (chart.data.labels.length > 40) {
+        data.forEach((value, index) => {
+            chart.data.datasets[index].data.shift();
+        });
         chart.data.labels.shift();
     }
     chart.update();
