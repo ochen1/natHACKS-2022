@@ -128,3 +128,6 @@ button.collapse-btn {
 button.collapse-btn:hover {
     background-color: rgba(0, 0, 0, 0.6);
 }
+button {
+    outline: none !important;
+}
